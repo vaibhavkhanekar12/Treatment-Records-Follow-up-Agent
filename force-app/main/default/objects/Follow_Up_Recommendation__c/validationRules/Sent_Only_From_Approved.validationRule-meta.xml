@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Sent_Only_From_Approved</fullName>
+    <active>true</active>
+    <description>External follow-ups may only move to Sent from Approved (or a failed send of an approved message).</description>
+    <errorConditionFormula>AND(
+    ISCHANGED(Status__c),
+    ISPICKVAL(Status__c, &quot;Sent&quot;),
+    NOT(ISPICKVAL(Audience__c, &quot;Internal&quot;)),
+    NOT(ISPICKVAL(PRIORVALUE(Status__c), &quot;Approved&quot;)),
+    NOT(ISPICKVAL(PRIORVALUE(Status__c), &quot;Send_Failed&quot;))
+)</errorConditionFormula>
+    <errorMessage>A client or provider follow-up can only be sent after it has been approved.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Client Status Update</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Threshold_Days__c</field>
+        <value xsi:type="xsd:double">30</value>
+    </values>
+    <values>
+        <field>Repeat_After_Days__c</field>
+        <value xsi:type="xsd:double">30</value>
+    </values>
+    <values>
+        <field>Escalate_After_Count__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>High_Priority_Days__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Records_Activity_Days__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Client_Contact_Days__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Default_Priority__c</field>
+        <value xsi:type="xsd:string">Low</value>
+    </values>
+    <values>
+        <field>Default_Channel__c</field>
+        <value xsi:type="xsd:string">Email</value>
+    </values>
+    <values>
+        <field>Auto_Create_Task__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Notes__c</field>
+        <value xsi:type="xsd:string">Monthly plain-language status update (template draft, bulk-approvable) once the matter is Threshold days past sign-up, then every Repeat_After_Days.</value>
+    </values>
+</CustomMetadata>

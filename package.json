@@ -1,0 +1,27 @@
+{
+  "name": "treatment-records-follow-up-agent",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Treatment & Records Follow-up Agent for Personal Injury matters (Salesforce + Agentforce)",
+  "scripts": {
+    "lint": "eslint **/lwc/**/*.js",
+    "test:unit": "sfdx-lwc-jest",
+    "test:unit:coverage": "sfdx-lwc-jest --coverage",
+    "prettier": "prettier --write \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
+    "prettier:verify": "prettier --check \"**/*.{cls,trigger,js,html}\""
+  },
+  "devDependencies": {
+    "@lwc/eslint-plugin-lwc": "^2.0.0",
+    "@prettier/plugin-xml": "^3.4.1",
+    "@salesforce/eslint-config-lwc": "^3.6.0",
+    "@salesforce/eslint-plugin-aura": "^2.1.0",
+    "@salesforce/eslint-plugin-lightning": "^1.0.0",
+    "@salesforce/sfdx-lwc-jest": "^5.1.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jest": "^28.6.0",
+    "prettier": "^3.3.3",
+    "prettier-plugin-apex": "^2.1.4",
+    "typescript": "^5.9.3"
+  }
+}

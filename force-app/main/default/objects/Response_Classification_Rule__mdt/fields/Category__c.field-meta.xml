@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Category__c</fullName>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Category</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Treatment_Continuing</fullName>
+                <default>false</default>
+                <label>Treatment Continuing</label>
+            </value>
+            <value>
+                <fullName>Treatment_Stopped</fullName>
+                <default>false</default>
+                <label>Treatment Stopped</label>
+            </value>
+            <value>
+                <fullName>Records_Sent</fullName>
+                <default>false</default>
+                <label>Records Sent</label>
+            </value>
+            <value>
+                <fullName>Provider_Action_Required</fullName>
+                <default>false</default>
+                <label>Provider Action Required</label>
+            </value>
+            <value>
+                <fullName>Callback_Requested</fullName>
+                <default>false</default>
+                <label>Callback Requested</label>
+            </value>
+            <value>
+                <fullName>Status_Question</fullName>
+                <default>false</default>
+                <label>Status Question</label>
+            </value>
+            <value>
+                <fullName>Opt_Out</fullName>
+                <default>false</default>
+                <label>Opt-Out Request</label>
+            </value>
+            <value>
+                <fullName>Unclear</fullName>
+                <default>false</default>
+                <label>Unclear</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

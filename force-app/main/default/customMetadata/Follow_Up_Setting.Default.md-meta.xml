@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Default</label>
+    <protected>false</protected>
+    <values>
+        <field>Open_Matter_Statuses__c</field>
+        <value xsi:type="xsd:string">Intake,Open,Treating,Pre-Demand</value>
+    </values>
+    <values>
+        <field>Practice_Area_Filter__c</field>
+        <value xsi:type="xsd:string">Personal Injury</value>
+    </values>
+    <values>
+        <field>Outstanding_Request_Statuses__c</field>
+        <value xsi:type="xsd:string">Requested,Partially Received</value>
+    </values>
+    <values>
+        <field>Bill_Request_Types__c</field>
+        <value xsi:type="xsd:string">Bills,Records and Bills</value>
+    </values>
+    <values>
+        <field>Excluded_Treatment_Statuses__c</field>
+        <value xsi:type="xsd:string">Cancelled,No Show</value>
+    </values>
+    <values>
+        <field>Restricted_Terms__c</field>
+        <value xsi:type="xsd:string">settlement,settle,case value,worth,liability,liable,at fault,fault,compensation,verdict,lawsuit,sue,diagnosis,prognosis,prescription,medical advice,legal advice,guarantee,guaranteed</value>
+    </values>
+    <values>
+        <field>Classification_Confidence_Threshold__c</field>
+        <value xsi:type="xsd:double">0.7</value>
+    </values>
+    <values>
+        <field>Batch_Size__c</field>
+        <value xsi:type="xsd:double">100</value>
+    </values>
+    <values>
+        <field>Max_AI_Drafts_Per_Run__c</field>
+        <value xsi:type="xsd:double">200</value>
+    </values>
+    <values>
+        <field>AI_Draft_Generator_Class__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Response_Classifier_Class__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>SMS_Channel_Class__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Fax_Channel_Class__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Firm_Name__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Org_Wide_Email_Address__c</field>
+        <value xsi:nil="true"/>
+    </values>
+</CustomMetadata>

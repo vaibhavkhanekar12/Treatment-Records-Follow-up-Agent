@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Treatment &amp; Records Follow-up: case manager work queue (review, approve, send, log responses).</description>
+    <label>Follow-up Work Queue</label>
+    <lwcComponent>treatmentRecordsFollowUpConsole</lwcComponent>
+    <motif>Custom53: Bell</motif>
+</CustomTab>

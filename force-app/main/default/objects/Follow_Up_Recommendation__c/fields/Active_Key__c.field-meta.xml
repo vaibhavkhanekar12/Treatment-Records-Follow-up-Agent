@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Active_Key__c</fullName>
+    <caseSensitive>true</caseSensitive>
+    <description>Equals Dedupe_Key__c while the recommendation is open (Pending Review, Approved, Send Failed); blank otherwise. Unique: guarantees at most one open recommendation per subject. Maintained by the Follow_Up_Recommendation_Before_Save flow.</description>
+    <externalId>true</externalId>
+    <label>Active Key</label>
+    <length>255</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>

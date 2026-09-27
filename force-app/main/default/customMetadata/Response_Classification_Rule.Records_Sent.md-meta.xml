@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Records Sent</label>
+    <protected>false</protected>
+    <values>
+        <field>Audience__c</field>
+        <value xsi:type="xsd:string">Provider</value>
+    </values>
+    <values>
+        <field>Keywords__c</field>
+        <value xsi:type="xsd:string">sent,faxed,mailed,emailed,uploaded,delivered,portal</value>
+    </values>
+    <values>
+        <field>Match_Type__c</field>
+        <value xsi:type="xsd:string">Contains</value>
+    </values>
+    <values>
+        <field>Recheck_Days__c</field>
+        <value xsi:type="xsd:double">7</value>
+    </values>
+    <values>
+        <field>Category__c</field>
+        <value xsi:type="xsd:string">Records_Sent</value>
+    </values>
+    <values>
+        <field>Sort_Order__c</field>
+        <value xsi:type="xsd:double">10</value>
+    </values>
+    <values>
+        <field>Next_Action__c</field>
+        <value xsi:type="xsd:string">Complete_And_Recheck</value>
+    </values>
+</CustomMetadata>

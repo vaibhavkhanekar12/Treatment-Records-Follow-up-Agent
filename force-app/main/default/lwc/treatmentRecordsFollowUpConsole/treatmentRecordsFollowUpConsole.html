@@ -1,0 +1,305 @@
+<template>
+    <lightning-card title="Follow-up Work Queue" icon-name="standard:task">
+        <div slot="actions">
+            <lightning-button-group>
+                <template lwc:if={isRecordPage}>
+                    <lightning-button label="Evaluate this matter" onclick={handleEvaluateMatter} data-id="evaluate"></lightning-button>
+                </template>
+                <lightning-button
+                    label="Bulk approve templates"
+                    onclick={handleBulkApprove}
+                    disabled={cannotBulkApprove}
+                    data-id="bulk-approve"
+                ></lightning-button>
+                <lightning-button
+                    label="Send selected"
+                    onclick={handleBulkSend}
+                    disabled={cannotBulkSend}
+                    data-id="bulk-send"
+                ></lightning-button>
+                <lightning-button-icon
+                    icon-name="utility:refresh"
+                    alternative-text="Refresh"
+                    onclick={handleRefresh}
+                ></lightning-button-icon>
+            </lightning-button-group>
+        </div>
+
+        <div class="slds-p-horizontal_medium">
+            <div class="slds-grid slds-gutters slds-wrap slds-m-bottom_small">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                    <lightning-combobox
+                        label="Status"
+                        value={statusFilter}
+                        options={statusOptions}
+                        onchange={handleStatusFilter}
+                    ></lightning-combobox>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                    <lightning-combobox
+                        label="Priority"
+                        value={priorityFilter}
+                        options={priorityOptions}
+                        onchange={handlePriorityFilter}
+                    ></lightning-combobox>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                    <lightning-combobox
+                        label="Type"
+                        value={typeFilter}
+                        options={typeOptions}
+                        onchange={handleTypeFilter}
+                    ></lightning-combobox>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4 slds-p-top_large">
+                    <lightning-input
+                        type="toggle"
+                        label="Assigned to me"
+                        checked={onlyMine}
+                        onchange={handleMineToggle}
+                        message-toggle-active=""
+                        message-toggle-inactive=""
+                    ></lightning-input>
+                </div>
+            </div>
+
+            <template lwc:if={isLoading}>
+                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+            </template>
+            <template lwc:if={error}>
+                <div class="slds-text-color_error slds-m-bottom_small" role="alert">{error}</div>
+            </template>
+
+            <p class="slds-text-body_small slds-m-bottom_x-small">{rowCountLabel}</p>
+            <template lwc:if={hasRows}>
+                <lightning-datatable
+                    key-field="id"
+                    data={rows}
+                    columns={columns}
+                    onrowselection={handleRowSelection}
+                    onrowaction={handleRowAction}
+                ></lightning-datatable>
+            </template>
+            <template lwc:else>
+                <div class="slds-text-align_center slds-p-around_medium slds-text-color_weak">No follow-ups match these filters.</div>
+            </template>
+
+            <template lwc:if={detail}>
+                <section class="slds-box slds-m-top_medium" data-id="detail">
+                    <div class="slds-grid slds-grid_align-spread">
+                        <h2 class="slds-text-heading_small">{item.name} · {item.typeLabel} · {item.matterName}</h2>
+                        <lightning-button-icon
+                            icon-name="utility:close"
+                            alternative-text="Close"
+                            onclick={handleCloseDetail}
+                        ></lightning-button-icon>
+                    </div>
+                    <p class="slds-m-top_x-small">
+                        <lightning-badge label={item.priority}></lightning-badge>
+                        <lightning-badge label={item.status}></lightning-badge>
+                        <lightning-badge label={item.audience}></lightning-badge>
+                        <lightning-badge label={item.channel}></lightning-badge>
+                    </p>
+
+                    <div class="section-title">Why (verified facts)</div>
+                    <p class="reason">{item.reason}</p>
+
+                    <div class="section-title">Rationale</div>
+                    <p class="reason">{detail.rationale}</p>
+
+                    <lightning-accordion allow-multiple-sections-open>
+                        <lightning-accordion-section name="facts" label="Matter facts">
+                            <div class="facts">{detail.matterFacts}</div>
+                        </lightning-accordion-section>
+                        <lightning-accordion-section name="history" label="Previous follow-ups">
+                            <div class="facts">{detail.history}</div>
+                        </lightning-accordion-section>
+                    </lightning-accordion>
+
+                    <template lwc:if={showDraft}>
+                        <div class="section-title">Draft ({item.draftSource})</div>
+                        <lightning-input
+                            label="Subject"
+                            value={draftSubject}
+                            onchange={handleSubjectChange}
+                            read-only={draftReadOnly}
+                            data-id="subject"
+                        ></lightning-input>
+                        <lightning-textarea
+                            label="Message"
+                            value={draftMessage}
+                            onchange={handleMessageChange}
+                            read-only={draftReadOnly}
+                            data-id="message"
+                        ></lightning-textarea>
+                        <template lwc:if={approvalSummary}>
+                            <p class="slds-text-body_small slds-text-color_success">{approvalSummary}</p>
+                        </template>
+                        <p class="slds-text-body_small slds-text-color_weak">
+                            Drafts are administrative only. Never discuss case value, liability, settlement or medical advice.
+                        </p>
+                    </template>
+
+                    <template lwc:if={detail.responseText}>
+                        <div class="section-title">Response received ({item.responseClassification})</div>
+                        <p class="reason">{detail.responseText}</p>
+                    </template>
+
+                    <div class="slds-m-top_small">
+                        <lightning-button-group>
+                            <template lwc:if={showDraft}>
+                                <lightning-button
+                                    label="Save draft"
+                                    onclick={handleSaveDraft}
+                                    disabled={notOpen}
+                                    data-id="save"
+                                ></lightning-button>
+                                <lightning-button
+                                    label="Regenerate draft"
+                                    onclick={handleRegenerate}
+                                    disabled={notOpen}
+                                    data-id="regenerate"
+                                ></lightning-button>
+                                <lightning-button
+                                    variant="brand"
+                                    label="Approve"
+                                    onclick={handleApprove}
+                                    disabled={cannotApproveThis}
+                                    data-id="approve"
+                                ></lightning-button>
+                            </template>
+                            <lightning-button
+                                variant="success"
+                                label={sendLabel}
+                                onclick={handleSend}
+                                disabled={cannotSendThis}
+                                data-id="send"
+                            ></lightning-button>
+                            <lightning-button
+                                label="Reject"
+                                onclick={handleShowReject}
+                                disabled={notOpen}
+                                data-id="reject"
+                            ></lightning-button>
+                            <lightning-button
+                                label="Override"
+                                onclick={handleShowOverride}
+                                disabled={cannotOverride}
+                                data-id="override"
+                            ></lightning-button>
+                            <lightning-button
+                                label="Complete"
+                                onclick={handleComplete}
+                                disabled={cannotComplete}
+                                data-id="complete"
+                            ></lightning-button>
+                            <lightning-button label="Log response" onclick={handleShowResponse} data-id="log-response"></lightning-button>
+                        </lightning-button-group>
+                    </div>
+
+                    <template lwc:if={showRejectPanel}>
+                        <div class="slds-box slds-m-top_small">
+                            <lightning-textarea
+                                label="Rejection reason"
+                                required
+                                value={rejectReason}
+                                data-field="rejectReason"
+                                onchange={handleFormChange}
+                            ></lightning-textarea>
+                            <lightning-button
+                                variant="destructive"
+                                label="Confirm reject"
+                                onclick={handleConfirmReject}
+                                data-id="confirm-reject"
+                            ></lightning-button>
+                            <lightning-button label="Cancel" class="slds-m-left_x-small" onclick={handleCancelPanel}></lightning-button>
+                        </div>
+                    </template>
+
+                    <template lwc:if={showOverridePanel}>
+                        <div class="slds-box slds-m-top_small">
+                            <lightning-textarea
+                                label="Override reason"
+                                required
+                                value={overrideReason}
+                                data-field="overrideReason"
+                                onchange={handleFormChange}
+                            ></lightning-textarea>
+                            <lightning-input
+                                type="date"
+                                label="Snooze until (closes this item)"
+                                value={snoozeUntil}
+                                data-field="snoozeUntil"
+                                onchange={handleFormChange}
+                            ></lightning-input>
+                            <lightning-combobox
+                                label="Priority"
+                                value={overridePriority}
+                                options={overridePriorityOptions}
+                                data-field="overridePriority"
+                                onchange={handleFormChange}
+                            ></lightning-combobox>
+                            <lightning-button
+                                variant="brand"
+                                label="Save override"
+                                class="slds-m-top_x-small"
+                                onclick={handleConfirmOverride}
+                                data-id="confirm-override"
+                            ></lightning-button>
+                            <lightning-button
+                                label="Cancel"
+                                class="slds-m-left_x-small slds-m-top_x-small"
+                                onclick={handleCancelPanel}
+                            ></lightning-button>
+                        </div>
+                    </template>
+
+                    <template lwc:if={showResponsePanel}>
+                        <div class="slds-box slds-m-top_small">
+                            <lightning-textarea
+                                label="Response (verbatim)"
+                                required
+                                value={responseText}
+                                data-field="responseText"
+                                onchange={handleFormChange}
+                            ></lightning-textarea>
+                            <lightning-combobox
+                                label="Received via"
+                                value={responseSource}
+                                options={sourceOptions}
+                                data-field="responseSource"
+                                onchange={handleFormChange}
+                            ></lightning-combobox>
+                            <div class="slds-grid slds-grid_vertical-align-end slds-gutters_x-small">
+                                <div class="slds-col">
+                                    <lightning-combobox
+                                        label="Category (confirm or change)"
+                                        value={responseCategory}
+                                        options={categoryOptions}
+                                        data-field="responseCategory"
+                                        onchange={handleFormChange}
+                                    ></lightning-combobox>
+                                </div>
+                                <div class="slds-col slds-grow-none">
+                                    <lightning-button label="Suggest" onclick={handleSuggestCategory} data-id="suggest"></lightning-button>
+                                </div>
+                            </div>
+                            <lightning-button
+                                variant="brand"
+                                label="Log response"
+                                class="slds-m-top_x-small"
+                                onclick={handleConfirmResponse}
+                                data-id="confirm-response"
+                            ></lightning-button>
+                            <lightning-button
+                                label="Cancel"
+                                class="slds-m-left_x-small slds-m-top_x-small"
+                                onclick={handleCancelPanel}
+                            ></lightning-button>
+                        </div>
+                    </template>
+                </section>
+            </template>
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,19 @@
+# Salesforce CLI / tooling
+.sf/
+.sfdx/
+.localdevserver/
+deploy-options.json
+# Node
+node_modules/
+coverage/
+npm-debug.log*
+# OS / editors
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea/
+# Local env / secrets — never commit
+.env
+*.key
+*.pem
+server.key

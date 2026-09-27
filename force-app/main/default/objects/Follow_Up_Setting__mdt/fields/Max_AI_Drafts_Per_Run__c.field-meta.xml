@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Max_AI_Drafts_Per_Run__c</fullName>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <label>Max AI Drafts Per Run</label>
+    <precision>5</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <type>Number</type>
+</CustomField>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>Follow_Up_Recommendation__c$Name</field>
+    </columns>
+    <columns>
+        <field>Follow_Up_Recommendation__c$Matter__c</field>
+    </columns>
+    <columns>
+        <aggregateTypes>Average</aggregateTypes>
+        <field>Follow_Up_Recommendation__c$Gap_Days__c</field>
+    </columns>
+    <columns>
+        <field>Follow_Up_Recommendation__c$Last_Treatment_Date__c</field>
+    </columns>
+    <columns>
+        <field>Follow_Up_Recommendation__c$Status__c</field>
+    </columns>
+    <columns>
+        <field>Follow_Up_Recommendation__c$CreatedDate</field>
+    </columns>
+    <description>Treatment-gap recommendations with average gap days (KPI: average gap days per matter).</description>
+    <filter>
+        <criteriaItems>
+            <column>Follow_Up_Recommendation__c$Recommendation_Type__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>Client_Check_In,Treatment_Gap_Review</value>
+        </criteriaItems>
+        <language>en_US</language>
+    </filter>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>Follow_Up_Recommendation__c$Recommendation_Type__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>Treatment Gaps (90 days)</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>Follow_Up_Recommendations__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>Follow_Up_Recommendation__c$CreatedDate</dateColumn>
+        <interval>INTERVAL_LAST90</interval>
+    </timeFrameFilter>
+</Report>

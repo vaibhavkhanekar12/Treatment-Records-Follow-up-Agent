@@ -1,0 +1,7 @@
+# Files the Salesforce CLI must not deploy
+package.xml
+**/jsconfig.json
+**/.eslintrc.json
+**/__tests__/**
+**/tsconfig.json
+**/*.ts

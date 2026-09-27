@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Stalled__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Set nightly by the Treatment &amp; Records Follow-up evaluation when treatment, records activity and client contact are all stale beyond configured thresholds. Cleared automatically when any activity resumes.</description>
+    <inlineHelpText>Potentially stalled: stale treatment, records activity and client contact (see Follow-up rules).</inlineHelpText>
+    <label>Stalled</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

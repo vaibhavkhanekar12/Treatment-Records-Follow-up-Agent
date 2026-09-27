@@ -1,0 +1,24 @@
+{
+  "packageDirectories": [
+    {
+      "path": "prerequisites",
+      "default": false
+    },
+    {
+      "path": "force-app",
+      "default": true
+    },
+    {
+      "path": "analytics",
+      "default": false
+    },
+    {
+      "path": "agentforce",
+      "default": false
+    }
+  ],
+  "name": "treatment-records-follow-up-agent",
+  "namespace": "",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "63.0"
+}

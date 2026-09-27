@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>63.0</apiVersion>
+    <assignments>
+        <description>Active_Key__c = Dedupe_Key__c while the recommendation is open, blank otherwise. The field is unique, so the database itself guarantees at most one open recommendation per follow-up subject, whoever writes the record.</description>
+        <name>Set_Active_Key</name>
+        <label>Set Active Key</label>
+        <locationX>176</locationX>
+        <locationY>287</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Active_Key__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>ActiveKeyValue</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <description>Treatment &amp; Records Follow-up: maintains the unique Active_Key__c of open Follow-up Recommendations (idempotency / duplicate prevention). Same-record field update, so a before-save flow is the recommended, fastest mechanism.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>Dedupe key while Status is Pending Review, Approved or Send Failed; otherwise blank.</description>
+        <name>ActiveKeyValue</name>
+        <dataType>String</dataType>
+        <expression>IF(OR(ISPICKVAL({!$Record.Status__c}, &quot;Pending_Review&quot;), ISPICKVAL({!$Record.Status__c}, &quot;Approved&quot;), ISPICKVAL({!$Record.Status__c}, &quot;Send_Failed&quot;)), {!$Record.Dedupe_Key__c}, &quot;&quot;)</expression>
+    </formulas>
+    <interviewLabel>Follow-up Recommendation Before Save {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Follow-up Recommendation - Before Save</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Set_Active_Key</targetReference>
+        </connector>
+        <object>Follow_Up_Recommendation__c</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

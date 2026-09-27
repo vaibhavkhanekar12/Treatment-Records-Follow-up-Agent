@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>Follow_Up_Recommendation__c$Name</field>
+    </columns>
+    <columns>
+        <field>Follow_Up_Recommendation__c$Matter__c</field>
+    </columns>
+    <columns>
+        <field>Follow_Up_Recommendation__c$Medical_Provider__c</field>
+    </columns>
+    <columns>
+        <field>Follow_Up_Recommendation__c$Records_Age_Days__c</field>
+    </columns>
+    <columns>
+        <field>Follow_Up_Recommendation__c$Prior_Follow_Up_Count__c</field>
+    </columns>
+    <columns>
+        <field>Follow_Up_Recommendation__c$Assigned_To__c</field>
+    </columns>
+    <columns>
+        <field>Follow_Up_Recommendation__c$CreatedDate</field>
+    </columns>
+    <description>Provider escalations after missed follow-ups in the last 90 days.</description>
+    <filter>
+        <criteriaItems>
+            <column>Follow_Up_Recommendation__c$Recommendation_Type__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>Provider_Escalation</value>
+        </criteriaItems>
+        <language>en_US</language>
+    </filter>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>Follow_Up_Recommendation__c$Status__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>Provider Escalations (90 days)</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>Follow_Up_Recommendations__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>Follow_Up_Recommendation__c$CreatedDate</dateColumn>
+        <interval>INTERVAL_LAST90</interval>
+    </timeFrameFilter>
+</Report>

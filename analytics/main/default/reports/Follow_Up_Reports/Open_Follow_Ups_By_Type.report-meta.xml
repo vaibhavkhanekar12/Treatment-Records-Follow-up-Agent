@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>Follow_Up_Recommendation__c$Name</field>
+    </columns>
+    <columns>
+        <field>Follow_Up_Recommendation__c$Matter__c</field>
+    </columns>
+    <columns>
+        <field>Follow_Up_Recommendation__c$Priority__c</field>
+    </columns>
+    <columns>
+        <field>Follow_Up_Recommendation__c$Status__c</field>
+    </columns>
+    <columns>
+        <field>Follow_Up_Recommendation__c$Assigned_To__c</field>
+    </columns>
+    <columns>
+        <field>Follow_Up_Recommendation__c$Recommended_Date__c</field>
+    </columns>
+    <description>Matters needing follow-up: open recommendations grouped by type.</description>
+    <filter>
+        <criteriaItems>
+            <column>Follow_Up_Recommendation__c$Status__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>Pending_Review,Approved,Send_Failed</value>
+        </criteriaItems>
+        <language>en_US</language>
+    </filter>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>Follow_Up_Recommendation__c$Recommendation_Type__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>Open Follow-ups by Type</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>Follow_Up_Recommendations__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>Follow_Up_Recommendation__c$CreatedDate</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

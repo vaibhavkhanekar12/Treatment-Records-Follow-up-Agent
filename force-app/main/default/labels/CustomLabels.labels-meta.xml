@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>FollowUp_Draft_CheckIn_Subject</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Client check-in email subject</shortDescription>
+        <value>Checking in on your care</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Draft_CheckIn_Body</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Client check-in body. {0}=client first name {1}=sender {2}=firm {3}=last treatme</shortDescription>
+        <value>Hi {0},
+
+This is {1} from {2}. We are checking in because our file shows your most recent treatment visit on {3}. Could you let us know whether you are still receiving treatment and whether you have any upcoming appointments? If anything has changed with your providers or your contact details, please let us know.
+
+Thank you,
+{1}
+{2}</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Draft_CheckIn_No_Treatment_Body</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Client check-in body when no treatment is recorded. {0}=first name {1}=sender {2</shortDescription>
+        <value>Hi {0},
+
+This is {1} from {2}. We are checking in because our file does not yet show any treatment visits. Could you let us know whether you have started treatment, and with which providers? If you have upcoming appointments, please share the dates.
+
+Thank you,
+{1}
+{2}</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Draft_CheckIn_SMS</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Client check-in SMS. {0}=first name {1}=sender {2}=firm</shortDescription>
+        <value>Hi {0}, this is {1} at {2}. Checking in: are you still receiving treatment, and do you have any upcoming appointments? Reply here or call us. Reply STOP to opt out.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Draft_CheckIn_Call_Script</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Client check-in phone script. {0}=first name {1}=last treatment date</shortDescription>
+        <value>Call script for {0}: confirm whether treatment is continuing (last recorded visit: {1}), ask about upcoming appointments and any new providers, and confirm contact details. Do not discuss case value or settlement.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Draft_Provider_Subject</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Provider follow-up subject. {0}=patient name {1}=request type</shortDescription>
+        <value>Follow-up: {1} request for {0}</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Draft_Provider_Body</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Provider follow-up body. {0}=provider {1}=request type {2}=request date {3}=pati</shortDescription>
+        <value>Hello {0},
+
+We are following up on our {1} request dated {2} for our client {3} (date of birth: {4}). Our file shows this request is still outstanding. This is follow-up number {5}.
+
+Please send the requested documents, or let us know if anything further (such as an updated authorization) is needed to complete the request.
+
+Thank you,
+{6}
+{7}</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Draft_Status_Update_Subject</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Client monthly status update subject. {0}=firm</shortDescription>
+        <value>Your monthly update from {0}</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Draft_Status_Update_Body</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Client monthly status update. {0}=first name {1}=firm {2}=stage {3}=records rece</shortDescription>
+        <value>Hi {0},
+
+This is your monthly update from {1}. Your matter is currently at the "{2}" stage. We have received records from {3} of the {4} providers we have requested them from, and we are continuing to follow up on any that are outstanding.
+
+If you have had any new treatment, changes in providers, or changes to your contact details, please let us know.
+
+This is an administrative update only. Please call us if you have any questions.
+
+{5}
+{1}</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Reason_Treatment_Gap</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Reason. {0}=last treatment date {1}=gap days {2}=threshold {3}=unanswered check-</shortDescription>
+        <value>Last recorded treatment: {0} ({1} days ago). Treatment-gap threshold: {2} days. Unanswered client check-ins since then: {3}.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Reason_No_Treatment</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Reason. {0}=days since sign-up {1}=threshold</shortDescription>
+        <value>No treatment is recorded on this matter. Days since sign-up: {0}. Treatment-gap threshold: {1} days.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Reason_No_Client</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Reason suffix</shortDescription>
+        <value> No client contact is linked to this matter, so a client check-in cannot be drafted.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Reason_Unanswered_Check_Ins</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Reason suffix. {0}=count {1}=threshold</shortDescription>
+        <value> {0} client check-ins have gone unanswered (escalation threshold: {1}). Case manager review recommended.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Reason_Records_Outstanding</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Reason. {0}=type {1}=provider {2}=date {3}=age days {4}=follow-ups sent {5}=thre</shortDescription>
+        <value>{0} request to {1} dated {2} is outstanding ({3} days). Follow-ups already sent: {4}. Follow-up threshold: {5} days.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Reason_Provider_Escalation</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Reason. {0}=type {1}=provider {2}=date {3}=follow-ups {4}=threshold {5}=last fol</shortDescription>
+        <value>{0} request to {1} dated {2} is still outstanding after {3} follow-ups (escalation threshold: {4}). Last follow-up: {5}. Case manager action required.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Reason_Missing_Bills</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Reason. {0}=provider {1}=last visit</shortDescription>
+        <value>Treatment at {0} is recorded (last visit {1}), but no bills request exists for this provider on this matter.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Reason_Stalled</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Reason. {0}=treatment days {1}=threshold {2}=records activity {3}=threshold {4}=</shortDescription>
+        <value>Potentially stalled matter. Days since treatment: {0} (threshold {1}). Last records activity: {2} (threshold {3} days). Last client contact: {4} (threshold {5} days). Supervising attorney / case manager review recommended.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Reason_Status_Update</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Reason. {0}=last update</shortDescription>
+        <value>Monthly client status update due. Last update sent: {0}.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Reason_No_Channel</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Reason suffix</shortDescription>
+        <value> No email or mobile number is on file for the recipient; drafted as a call script.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Reason_Upcoming_Treatment</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Internal note</shortDescription>
+        <value>Upcoming treatment is scheduled; client check-in not needed.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Not_Recorded</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Placeholder for a missing value</shortDescription>
+        <value>Not recorded</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Template_Rationale</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Default rationale for template drafts</shortDescription>
+        <value>Raised by the configured follow-up rule based on the facts above. Review the draft, confirm the facts are current, then approve or edit.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Error_No_Approve_Permission</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error</shortDescription>
+        <value>You do not have permission to approve follow-up communications.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Error_No_Send_Permission</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error</shortDescription>
+        <value>You do not have permission to send follow-up communications.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Error_No_Bulk_Approve_Permission</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error</shortDescription>
+        <value>You do not have permission to bulk-approve follow-up communications.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Error_No_Override_Permission</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error</shortDescription>
+        <value>You do not have permission to override follow-up recommendations.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Error_No_Access</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error</shortDescription>
+        <value>You do not have edit access to one or more of the selected recommendations.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Error_Not_Approved</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error. {0}=record</shortDescription>
+        <value>{0} has not been approved. External communications must be approved before sending.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Error_Invalid_Status</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error. {0}=record {1}=status</shortDescription>
+        <value>{0} cannot be changed while in status {1}.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Error_Reason_Required</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error</shortDescription>
+        <value>A reason is required.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Error_Bulk_Approve_Non_Template</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error. {0}=record</shortDescription>
+        <value>{0} has an AI-generated or edited draft and must be reviewed and approved individually.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Error_No_Recipient</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error. {0}=record</shortDescription>
+        <value>{0} has no recipient address for the selected channel.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Error_Empty_Draft</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error. {0}=record</shortDescription>
+        <value>{0} has no draft message to approve.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Error_Matter_Not_Found</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error</shortDescription>
+        <value>The matter could not be found or you do not have access to it.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Error_Invalid_Category</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error. {0}=category</shortDescription>
+        <value>Unknown response category: {0}.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_AI_Draft_Withheld</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rationale note when guard discards AI output</shortDescription>
+        <value>The AI draft was withheld because it referenced a restricted topic (legal, settlement or medical). The template draft is shown instead.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Error_Snooze_Date</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error</shortDescription>
+        <value>The snooze date must be in the future.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Error_Email_Opt_Out</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error</shortDescription>
+        <value>The client has opted out of email. Choose another channel or contact the client directly.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Error_Response_Required</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error</shortDescription>
+        <value>Response text is required.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Reason_Unmatched_Response</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Reason for a response with no matching sent follow-up</shortDescription>
+        <value>Inbound response received with no matching sent follow-up on this matter. Case manager review required.</value>
+    </labels>
+    <labels>
+        <fullName>FollowUp_Reason_Inbound_Review</fullName>
+        <categories>Treatment Records Follow-up</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Reason. {0}=audience {1}=recommendation {2}=category {3}=confidence</shortDescription>
+        <value>Inbound {0} response to {1} classified as "{2}" (confidence {3}%). Case manager review required.</value>
+    </labels>
+</CustomLabels>

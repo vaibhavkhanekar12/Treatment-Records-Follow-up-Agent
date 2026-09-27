@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Fax_Channel_Class__c</fullName>
+    <description>Apex class implementing IFollowUpChannel for Fax. Blank = manual Task.</description>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <label>Fax Channel Class</label>
+    <length>120</length>
+    <required>false</required>
+    <type>Text</type>
+</CustomField>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AI_Draft_Generator_Class__c</fullName>
+    <description>Apex class implementing IFollowUpDraftGenerator. Blank = template drafts only.</description>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <label>AI Draft Generator Class</label>
+    <length>120</length>
+    <required>false</required>
+    <type>Text</type>
+</CustomField>

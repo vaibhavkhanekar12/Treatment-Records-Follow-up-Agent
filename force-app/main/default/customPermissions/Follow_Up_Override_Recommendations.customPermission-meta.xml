@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Change priority, snooze, or close follow-up recommendations without sending (reason required).</description>
+    <isLicensed>false</isLicensed>
+    <label>Override Follow-up Recommendations</label>
+</CustomPermission>

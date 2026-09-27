@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Recommendation_Type__c</fullName>
+    <label>Recommendation Type</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Client_Check_In</fullName>
+                <default>false</default>
+                <label>Client Check-In</label>
+            </value>
+            <value>
+                <fullName>Treatment_Gap_Review</fullName>
+                <default>false</default>
+                <label>Treatment Gap Review</label>
+            </value>
+            <value>
+                <fullName>Provider_Follow_Up</fullName>
+                <default>false</default>
+                <label>Provider Records Follow-up</label>
+            </value>
+            <value>
+                <fullName>Provider_Escalation</fullName>
+                <default>false</default>
+                <label>Provider Escalation</label>
+            </value>
+            <value>
+                <fullName>Missing_Bills</fullName>
+                <default>false</default>
+                <label>Missing Bills</label>
+            </value>
+            <value>
+                <fullName>Stalled_Matter_Review</fullName>
+                <default>false</default>
+                <label>Stalled Matter Review</label>
+            </value>
+            <value>
+                <fullName>Client_Status_Update</fullName>
+                <default>false</default>
+                <label>Client Status Update</label>
+            </value>
+            <value>
+                <fullName>Inbound_Response_Review</fullName>
+                <default>false</default>
+                <label>Inbound Response Review</label>
+            </value>
+            <value>
+                <fullName>Case_Manager_Escalation</fullName>
+                <default>false</default>
+                <label>Case Manager Escalation</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

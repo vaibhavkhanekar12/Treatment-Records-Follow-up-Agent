@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Configurable thresholds for the Treatment &amp; Records Follow-up rule engine. DeveloperName identifies the rule (Treatment_Gap, Records_Follow_Up, Provider_Escalation, Missing_Bills, Stalled_Matter, Client_Status_Update).</description>
+    <label>Follow-up Rule</label>
+    <pluralLabel>Follow-up Rules</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>
