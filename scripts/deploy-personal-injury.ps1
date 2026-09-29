@@ -83,39 +83,79 @@ elseif (-not $SkipPrerequisites) {
         -Arguments $fieldArgs `
         -FailureMessage 'Required Matter field deployment failed. Main package deployment was not started.'
 
-    Write-Host 'Stage 2/4: deploying Treatment Event, Records Request, and Medical Provider objects...' -ForegroundColor Cyan
+    Write-Host 'Stage 2/6: creating supporting custom objects...' -ForegroundColor Cyan
+
+    # Create the object definitions first. Fields are deployed in a separate
+    # transaction so lookup/reference fields never depend on an object that is
+    # only being created in the same deployment.
+    Invoke-SfDeploy `
+        -Arguments @(
+            'project', 'deploy', 'start',
+            '--source-dir', 'prerequisites/main/default/objects/Medical_Provider__c/Medical_Provider__c.object-meta.xml',
+            '--source-dir', 'prerequisites/main/default/objects/Records_Request__c/Records_Request__c.object-meta.xml',
+            '--source-dir', 'prerequisites/main/default/objects/Treatment_Event__c/Treatment_Event__c.object-meta.xml',
+            '--target-org', $TargetOrg,
+            '--wait', $Wait
+        ) `
+        -FailureMessage 'Supporting custom object definition deployment failed. Main package deployment was not started.'
+
+    Write-Host 'Stage 3/6: deploying supporting custom object fields...' -ForegroundColor Cyan
 
     Invoke-SfDeploy `
         -Arguments @(
             'project', 'deploy', 'start',
-            '--source-dir', 'prerequisites/main/default/objects/Medical_Provider__c',
-            '--source-dir', 'prerequisites/main/default/objects/Records_Request__c',
-            '--source-dir', 'prerequisites/main/default/objects/Treatment_Event__c',
+            '--source-dir', 'prerequisites/main/default/objects/Medical_Provider__c/fields',
+            '--source-dir', 'prerequisites/main/default/objects/Records_Request__c/fields',
+            '--source-dir', 'prerequisites/main/default/objects/Treatment_Event__c/fields',
             '--target-org', $TargetOrg,
             '--wait', $Wait
         ) `
-        -FailureMessage 'Required supporting data object deployment failed. Main package deployment was not started.'
+        -FailureMessage 'Supporting custom object field deployment failed. Main package deployment was not started.'
 }
 else {
     Write-Host 'Stage 1/4: skipping prerequisites (-SkipPrerequisites).' -ForegroundColor Yellow
 }
 
-Write-Host 'Stage 3/4: deploying Follow-up Custom Metadata Types...' -ForegroundColor Cyan
+Write-Host 'Stage 4/6: creating Follow-up Custom Metadata Types...' -ForegroundColor Cyan
 
-# Deploy CMDT definitions before their records and Apex consumers.
-# In particular, FollowUpConfig references Response_Classification_Rule__mdt.
+# Deploy CMDT object definitions first. Salesforce must have the
+# Custom Metadata Type entity before its CustomField components can resolve it.
 Invoke-SfDeploy `
     -Arguments @(
         'project', 'deploy', 'start',
-        '--source-dir', 'force-app/main/default/objects/Follow_Up_Rule__mdt',
-        '--source-dir', 'force-app/main/default/objects/Follow_Up_Setting__mdt',
-        '--source-dir', 'force-app/main/default/objects/Response_Classification_Rule__mdt',
+        '--source-dir', 'force-app/main/default/objects/Follow_Up_Rule__mdt/Follow_Up_Rule__mdt.object-meta.xml',
+        '--source-dir', 'force-app/main/default/objects/Follow_Up_Setting__mdt/Follow_Up_Setting__mdt.object-meta.xml',
+        '--source-dir', 'force-app/main/default/objects/Response_Classification_Rule__mdt/Response_Classification_Rule__mdt.object-meta.xml',
         '--target-org', $TargetOrg,
         '--wait', $Wait
     ) `
-    -FailureMessage 'Custom Metadata Type deployment failed. Main package deployment was not started.'
+    -FailureMessage 'Custom Metadata Type definition deployment failed. Main package deployment was not started.'
 
-Write-Host 'Stage 4/4: deploying dependent solution, Agentforce Apex, and analytics...' -ForegroundColor Cyan
+Write-Host 'Stage 5/6: deploying Custom Metadata Type fields...' -ForegroundColor Cyan
+
+Invoke-SfDeploy `
+    -Arguments @(
+        'project', 'deploy', 'start',
+        '--source-dir', 'force-app/main/default/objects/Follow_Up_Rule__mdt/fields',
+        '--source-dir', 'force-app/main/default/objects/Follow_Up_Setting__mdt/fields',
+        '--source-dir', 'force-app/main/default/objects/Response_Classification_Rule__mdt/fields',
+        '--target-org', $TargetOrg,
+        '--wait', $Wait
+    ) `
+    -FailureMessage 'Custom Metadata Type field deployment failed. Main package deployment was not started.'
+
+Write-Host 'Stage 5/6: deploying Custom Metadata Type records...' -ForegroundColor Cyan
+
+Invoke-SfDeploy `
+    -Arguments @(
+        'project', 'deploy', 'start',
+        '--source-dir', 'force-app/main/default/customMetadata',
+        '--target-org', $TargetOrg,
+        '--wait', $Wait
+    ) `
+    -FailureMessage 'Custom Metadata record deployment failed. Main package deployment was not started.'
+
+Write-Host 'Stage 6/6: deploying dependent solution, Agentforce Apex, and analytics...' -ForegroundColor Cyan
 
 Invoke-SfDeploy `
     -Arguments @(
