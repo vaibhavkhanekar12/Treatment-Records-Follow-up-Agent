@@ -6,7 +6,7 @@ Salesforce + Agentforce solution for a **Personal Injury law firm**. It monitors
 
 ## End-to-end workflow
 
-Nightly evaluator scans open PI matters → deterministic rule engine evaluates configured thresholds → Follow_Up_Recommendation__c stores the recommendation and facts → Salesforce in-app notification alerts the assigned case manager → optional AI/template drafting prepares the message → Follow-up Work Queue supports edit/approve/reject/override/send/log-response → delivery is recorded → inbound response can be classified → deterministic re-check/review action is scheduled.
+Nightly evaluator scans open PI matters → deterministic rule engine evaluates treatment gaps, records age, missing bills, client-contact recency and stalled-risk conditions → Follow_Up_Recommendation__c stores the recommendation and facts → Salesforce in-app notification alerts the assigned case manager → optional AI/template drafting prepares the message and rationale → Follow-up Work Queue supports edit/approve/reject/override/send/log-response → only human-approved external messages can be sent, including the optional scheduled sender → delivery is recorded → inbound response can be classified → deterministic re-check/review action is scheduled.
 
 ## Follow-up use cases
 
@@ -14,8 +14,8 @@ Nightly evaluator scans open PI matters → deterministic rule engine evaluates 
 - Outstanding medical-records follow-up
 - Provider escalation after repeated unanswered follow-ups
 - Missing bills
-- Potentially stalled matter
-- Monthly client status update
+- Potentially stalled matter / rule-based at-risk signal
+- Monthly plain-language client status update (approval-controlled)
 - Case-manager in-app notification
 - Email delivery
 - SMS/Fax integration points with Task fallback
@@ -72,7 +72,7 @@ AI is used for drafting, rationale and inbound classification only. Eligibility 
 
 ## Deployment
 
-Deploy force-app, then analytics, then the optional agentforce Apex directory. Complete Agentforce Builder/Prompt Builder configuration manually in the target org.
+Deploy the prerequisite data model only when the target org does not already contain Matter__c, Treatment_Event__c, Records_Request__c and Medical_Provider__c; then deploy force-app, analytics, and the optional agentforce Apex directory. Complete Agentforce Builder/Prompt Builder configuration manually in the target org.
 
 Schedule the recurring jobs:
 ```apex
