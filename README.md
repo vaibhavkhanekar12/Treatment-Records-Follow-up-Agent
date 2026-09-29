@@ -72,7 +72,19 @@ AI is used for drafting, rationale and inbound classification only. Eligibility 
 
 ## Deployment
 
-Deploy the prerequisite data model only when the target org does not already contain Matter__c, Treatment_Event__c, Records_Request__c and Medical_Provider__c; then deploy force-app, analytics, and the optional agentforce Apex directory. Complete Agentforce Builder/Prompt Builder configuration manually in the target org.
+If the target org does not already contain the repository's prerequisite data model, deploy it **first**, then deploy the solution. Do not deploy the sample prerequisite objects into an established org that already has its own Matter / Treatment Event / Records Request / Medical Provider data model.
+
+For the Personal Injury org on Windows, use the ordered deployment script:
+
+```powershell
+.\\scripts\\deploy-personal-injury.ps1 -TargetOrg Personal_Injury_Org
+```
+
+The script stops if the prerequisite deployment fails, preventing cascading `Medical_Provider__c`, `Records_Request__c`, custom metadata, and dependent Apex compiler errors.
+
+If the target org already has those objects, skip `prerequisites/` and follow `docs/deployment.md` to map the existing data model before deploying the solution.
+
+Complete Agentforce Builder/Prompt Builder configuration manually in the target org.
 
 Schedule the recurring jobs:
 ```apex
