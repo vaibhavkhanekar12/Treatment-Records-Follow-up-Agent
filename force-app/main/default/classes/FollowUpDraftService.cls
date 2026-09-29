@@ -102,13 +102,37 @@ public with sharing class FollowUpDraftService {
         if (matterIds.isEmpty()) {
             return;
         }
-        Map<Id, Matter__c> matters = new Map<Id, Matter__c>([SELECT Id, Client__r.Birthdate FROM Matter__c WHERE Id IN :matterIds]);
+        // Query the lookup Id directly instead of traversing Client__r. The Personal Injury
+        // org can have a different parent relationship name even when the field API name is
+        // Client__c. Using the lookup Id keeps this package compatible with that data model.
+        Map<Id, Matter__c> matters = new Map<Id, Matter__c>([
+            SELECT Id, Client__c
+            FROM Matter__c
+            WHERE Id IN :matterIds
+        ]);
+
+        Set<Id> clientIds = new Set<Id>();
+        for (Matter__c matter : matters.values()) {
+            if (matter.Client__c != null) {
+                clientIds.add(matter.Client__c);
+            }
+        }
+
+        Map<Id, Contact> clientsById = clientIds.isEmpty()
+            ? new Map<Id, Contact>()
+            : new Map<Id, Contact>([
+                SELECT Id, Birthdate
+                FROM Contact
+                WHERE Id IN :clientIds
+            ]);
+
         for (Follow_Up_Recommendation__c rec : recs) {
             Matter__c matter = matters.get(rec.Matter__c);
             if (matter == null || rec.Draft_Message__c == null) {
                 continue;
             }
-            Date birthdate = matter.Client__r == null ? null : matter.Client__r.Birthdate;
+            Contact client = clientsById.get(matter.Client__c);
+            Date birthdate = client == null ? null : client.Birthdate;
             rec.Draft_Message__c = rec.Draft_Message__c.replace(
                 FollowUpFactsBuilder.DOB_PLACEHOLDER,
                 birthdate == null ? Label.FollowUp_Not_Recorded : birthdate.format()
