@@ -138,10 +138,11 @@ Run the ordered deployment script:
 .\scripts\deploy-personal-injury.ps1 -TargetOrg Personal_Injury_Org
 ```
 
-Or run the two deployments manually:
+Or run the two data-model/solution deployments manually:
 
 ```bash
-sf project deploy start --source-dir prerequisites --target-org Personal_Injury_Org --wait 30
+sf project deploy start --metadata CustomObject:Medical_Provider__c --metadata CustomObject:Records_Request__c --target-org Personal_Injury_Org --wait 30
+sf project deploy start --metadata CustomObject:Follow_Up_Rule__mdt --metadata CustomObject:Follow_Up_Setting__mdt --metadata CustomObject:Response_Classification_Rule__mdt --target-org Personal_Injury_Org --wait 30
 sf project deploy start --source-dir force-app --source-dir agentforce --source-dir analytics --target-org Personal_Injury_Org --wait 30
 ```
 
