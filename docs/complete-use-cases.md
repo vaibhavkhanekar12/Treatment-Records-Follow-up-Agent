@@ -16,3 +16,22 @@
 
 ## Boundary
 The agent does not provide legal advice, medical advice, case valuation, liability conclusions, settlement recommendations, or autonomous client/provider sending.
+## Requirement traceability — Treatment & Records Follow-up Agent
+
+| Business requirement | Repository implementation |
+|---|---|
+| Monitor every open PI matter daily | FollowUpNightlyScheduler → FollowUpEvaluationBatch → FollowUpEvaluationService |
+| Treatment gap vs today | Follow_Up_Rule.Treatment_Gap + FollowUpRuleEngine.evaluateTreatmentGap |
+| Records requested vs received | Records_Request__c facts + Follow_Up_Rule.Records_Follow_Up |
+| Bills vs treatment events | Follow_Up_Rule.Missing_Bills + evaluateMissingBills |
+| Client contact recency | Completed client Task history in FollowUpMatterSelector |
+| Provider misses second follow-up | Follow_Up_Rule.Provider_Escalation with Escalate_After_Count__c = 2 |
+| Case-manager escalation Task | Auto_Create_Task__c = true + FollowUpEvaluationService task creation |
+| Stalled matter / at-risk signal | Treatment + records + client-contact staleness in evaluateStalledMatter; writes Matter__c.Stalled__c |
+| Monthly client update | Follow_Up_Rule.Client_Status_Update + client-facing draft |
+| Human approval before external send | FollowUpRecommendationService approve/bulkApprove + FollowUpApprovedSendBatch |
+| Approved messages sent on schedule | FollowUpApprovedSendScheduler |
+| Inbound response classification | Response_Classification_Rule__mdt + response/AI classification services |
+| Audit and reporting | Follow_Up_Recommendation__c, reports and dashboard |
+| ROI: treatment gap / records turnaround | Gap_Days__c, Records_Age_Days__c, recommendation/report data |
+| AI generation and summarization | Agentforce/Prompt Builder adapters; deterministic rules remain authoritative |
