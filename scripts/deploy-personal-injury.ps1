@@ -48,7 +48,7 @@ function Invoke-SfDeploy {
 }
 
 if ($DeployFullPrerequisites) {
-    Write-Host 'Stage 1/3: deploying full sample prerequisite data model...' -ForegroundColor Cyan
+    Write-Host 'Stage 1/4: deploying full sample prerequisite data model...' -ForegroundColor Cyan
 
     Invoke-SfDeploy `
         -Arguments @(
@@ -60,11 +60,10 @@ if ($DeployFullPrerequisites) {
         -FailureMessage 'Full prerequisite deployment failed. Main package deployment was not started.'
 }
 elseif (-not $SkipPrerequisites) {
-    Write-Host 'Stage 1/3: deploying required Matter fields and supporting data objects...' -ForegroundColor Cyan
+    Write-Host 'Stage 1/4: deploying required Matter fields...' -ForegroundColor Cyan
 
-    # The target org already has Matter__c, but it does not have the fields/data
-    # objects required by this solution. Deploy only the required Matter fields
-    # (never the sample Matter object definition) plus the three solution data objects.
+    # Matter__c already exists in the target org. Deploy only the fields required
+    # by this solution; never deploy the sample Matter__c object definition.
     $matterFields = @(
         'prerequisites/main/default/objects/Matter__c/fields/Case_Manager__c.field-meta.xml',
         'prerequisites/main/default/objects/Matter__c/fields/Client__c.field-meta.xml',
@@ -74,24 +73,34 @@ elseif (-not $SkipPrerequisites) {
         'prerequisites/main/default/objects/Matter__c/fields/Status__c.field-meta.xml'
     )
 
-    $deployArgs = @('project', 'deploy', 'start')
+    $fieldArgs = @('project', 'deploy', 'start')
     foreach ($field in $matterFields) {
-        $deployArgs += @('--source-dir', $field)
+        $fieldArgs += @('--source-dir', $field)
     }
-    $deployArgs += @('--source-dir', 'prerequisites/main/default/objects/Medical_Provider__c')
-    $deployArgs += @('--source-dir', 'prerequisites/main/default/objects/Records_Request__c')
-    $deployArgs += @('--source-dir', 'prerequisites/main/default/objects/Treatment_Event__c')
-    $deployArgs += @('--target-org', $TargetOrg, '--wait', $Wait)
+    $fieldArgs += @('--target-org', $TargetOrg, '--wait', $Wait)
 
     Invoke-SfDeploy `
-        -Arguments $deployArgs `
-        -FailureMessage 'Required Matter fields or supporting data object deployment failed. Main package deployment was not started.'
+        -Arguments $fieldArgs `
+        -FailureMessage 'Required Matter field deployment failed. Main package deployment was not started.'
+
+    Write-Host 'Stage 2/4: deploying Treatment Event, Records Request, and Medical Provider objects...' -ForegroundColor Cyan
+
+    Invoke-SfDeploy `
+        -Arguments @(
+            'project', 'deploy', 'start',
+            '--source-dir', 'prerequisites/main/default/objects/Medical_Provider__c',
+            '--source-dir', 'prerequisites/main/default/objects/Records_Request__c',
+            '--source-dir', 'prerequisites/main/default/objects/Treatment_Event__c',
+            '--target-org', $TargetOrg,
+            '--wait', $Wait
+        ) `
+        -FailureMessage 'Required supporting data object deployment failed. Main package deployment was not started.'
 }
 else {
     Write-Host 'Stage 1/3: skipping prerequisite objects (-SkipPrerequisites).' -ForegroundColor Yellow
 }
 
-Write-Host 'Stage 2/3: deploying Follow-up Custom Metadata Types...' -ForegroundColor Cyan
+Write-Host 'Stage 3/4: deploying Follow-up Custom Metadata Types...' -ForegroundColor Cyan
 
 # Deploy CMDT definitions before their records and Apex consumers.
 # In particular, FollowUpConfig references Response_Classification_Rule__mdt.
@@ -106,7 +115,7 @@ Invoke-SfDeploy `
     ) `
     -FailureMessage 'Custom Metadata Type deployment failed. Main package deployment was not started.'
 
-Write-Host 'Stage 3/3: deploying dependent solution, Agentforce Apex, and analytics...' -ForegroundColor Cyan
+Write-Host 'Stage 4/4: deploying dependent solution, Agentforce Apex, and analytics...' -ForegroundColor Cyan
 
 Invoke-SfDeploy `
     -Arguments @(
