@@ -4,11 +4,13 @@
 
 | Order | Directory | Contents | When |
 |---|---|---|---|
-| 0 | `prerequisites/` | Minimal Matter / Treatment Event / Records Request / Medical Provider objects | **Scratch/dev orgs only.** Never deploy to an org that already has these objects. Map fields instead (`org-discovery.md`). |
+| 0 | `prerequisites/` | Minimal Matter / Treatment Event / Records Request / Medical Provider objects | **Only when the target org does not already have these objects.** Never deploy these sample definitions over an established firm's data model. |
 | 1 | `force-app/` | Core solution | Every org |
 | 2 | `analytics/` | Report types, reports, dashboard | After core |
 | 3 | `agentforce/` | Prompt grounding + Einstein adapters (Apex) | Only orgs with Einstein generative AI / Agentforce |
 | 4 | Manual | Prompt templates, agent, topics, actions | `agentforce.md` sections 5–7 |
+
+**Important:** Package directories that contain dependent metadata may need to be deployed sequentially. This repository keeps the foundational data model in `prerequisites/` so the dependent solution can be compiled only after those objects exist in the target org.
 
 ## 2. Pre-deployment checklist
 
@@ -23,14 +25,25 @@
 
 ### Scratch / developer org (full stack)
 ```bash
-sf org login web --alias pi-dev                       # or: sf org create scratch -f config/project-scratch-def.json -a pi-dev
-sf project deploy start --source-dir prerequisites --target-org pi-dev
-sf project deploy start --source-dir force-app     --target-org pi-dev
-sf project deploy start --source-dir analytics     --target-org pi-dev
+sf org login web --alias pi-dev
+sf project deploy start --source-dir prerequisites --target-org pi-dev --wait 30
+sf project deploy start --source-dir force-app --target-org pi-dev --wait 30
+sf project deploy start --source-dir analytics --target-org pi-dev --wait 30
+sf project deploy start --source-dir agentforce --target-org pi-dev --wait 30
 sf org assign permset --name Follow_Up_Case_Manager --target-org pi-dev
 sf apex run --file scripts/apex/create-sample-data.apex --target-org pi-dev
 sf apex run test --target-org pi-dev --test-level RunLocalTests --code-coverage --result-format human --wait 30
 ```
+
+### Personal Injury org — one-command ordered deployment (Windows PowerShell)
+
+If the target org does **not** already contain the repository's prerequisite objects:
+
+```powershell
+.\scripts\deploy-personal-injury.ps1 -TargetOrg Personal_Injury_Org
+```
+
+The script performs two separate deployments and stops if the prerequisite deployment fails. This prevents the cascading `Medical_Provider__c`, `Records_Request__c`, and dependent Apex compiler errors shown when the main package is deployed before its data-model dependencies.
 
 ### Sandbox / production (existing data model)
 ```bash
@@ -104,17 +117,38 @@ The implementation is intentionally mapped to the Treatment & Records Follow-up 
 - ROI data: Gap_Days__c and Records_Age_Days__c support treatment-gap and records-delay KPI reporting; the reporting layer should be mapped to the firm's actual data model before production rollout.
 - AI boundaries: AI is limited to drafting, summarization/rationale and inbound classification. Eligibility and escalation decisions remain deterministic.
 
-## 9. Missing prerequisite objects during deployment
+## 9. Missing prerequisite objects / cascading deployment errors
 
-If deployment errors show invalid or missing types such as Medical_Provider__c or Records_Request__c, do not treat the resulting Apex errors as independent defects. First confirm the target org's data model.
+If deployment errors show invalid or missing types such as `Medical_Provider__c` or `Records_Request__c`, do not treat the resulting Apex errors as independent defects. They are usually cascading metadata/compiler errors caused by the missing foundational objects.
 
-- If the target org already has these objects, map the repository fields to the existing objects and deploy only force-app / analytics / agentforce.
-- If the target org does not have the required objects, deploy prerequisites first:
+The same applies to errors such as:
 
-    sf project deploy start --source-dir prerequisites --target-org Personal_Injury_Org --wait 30
+- `referenceTo value ... does not resolve to a valid sObject type`
+- `Invalid type: Medical_Provider__c`
+- `DML requires SObject or SObject list type`
+- `Variable does not exist: provider`
+- `Invalid type: Response_Classification_Rule__mdt`
+- `Custom metadata type Response_Classification_Rule__mdt is not available in this organization`
 
-Then deploy the solution:
+### If the target org does not have the prerequisite objects
 
-    sf project deploy start --source-dir force-app --source-dir agentforce --source-dir analytics --target-org Personal_Injury_Org --wait 30
+Run the ordered deployment script:
 
-The prerequisite directory is intentionally separated because those object definitions are sample/minimal data-model components and must not overwrite an established firm's production data model.
+```powershell
+.\scripts\deploy-personal-injury.ps1 -TargetOrg Personal_Injury_Org
+```
+
+Or run the two deployments manually:
+
+```bash
+sf project deploy start --source-dir prerequisites --target-org Personal_Injury_Org --wait 30
+sf project deploy start --source-dir force-app --source-dir agentforce --source-dir analytics --target-org Personal_Injury_Org --wait 30
+```
+
+**Do not** run the second command if the first command failed.
+
+### If the target org already has those objects
+
+Do not deploy `prerequisites/`. Instead, confirm the real org's API names and field relationships in `docs/org-discovery.md`, map the solution to that data model, and deploy only the solution packages.
+
+This separation is intentional because dependent package directories can require sequential deployments.
