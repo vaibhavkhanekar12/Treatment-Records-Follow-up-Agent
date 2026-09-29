@@ -35,15 +35,28 @@ sf apex run --file scripts/apex/create-sample-data.apex --target-org pi-dev
 sf apex run test --target-org pi-dev --test-level RunLocalTests --code-coverage --result-format human --wait 30
 ```
 
-### Personal Injury org — one-command ordered deployment (Windows PowerShell)
+### Personal Injury org — one-command ordered deployment (Windows)
 
-If the target Personal Injury org is missing `Medical_Provider__c` and `Records_Request__c` (the dependencies shown in the deployment errors):
+If the target Personal Injury org is missing `Medical_Provider__c` and `Records_Request__c` (the dependencies shown in the deployment errors), **do not use VS Code's "Deploy Source to Org" on `force-app` directly**. Run the staged deployment instead:
 
 ```powershell
 .\scripts\deploy-personal-injury.ps1 -TargetOrg Personal_Injury_Org
 ```
 
-The script performs three ordered deployments and stops if any stage fails: (1) the missing Medical Provider / Records Request dependencies, (2) Follow-up Custom Metadata Types, and (3) the dependent solution. Use `-DeployFullPrerequisites` only for a scratch/developer org that is missing the entire sample Matter / Treatment Event / Records Request / Medical Provider data model. This prevents the cascading `Medical_Provider__c`, `Records_Request__c`, `Response_Classification_Rule__mdt`, and dependent Apex compiler errors shown in the deployment.
+Or from Command Prompt:
+
+```cmd
+scripts\deploy-personal-injury.cmd Personal_Injury_Org
+```
+
+The script performs three separate deployments and stops immediately if a stage fails:
+
+1. `Medical_Provider__c` + `Records_Request__c`
+2. `Follow_Up_Rule__mdt` + `Follow_Up_Setting__mdt` + `Response_Classification_Rule__mdt`
+3. `force-app` + `agentforce` + `analytics`
+
+This ordering is intentional because Salesforce documents that dependent package directories sometimes need to be deployed sequentially rather than as one transaction. Use `-DeployFullPrerequisites` only for a scratch/developer org missing the entire sample Matter / Treatment Event / Records Request / Medical Provider model. If the target org already has the prerequisite objects with compatible APIs, use `-SkipPrerequisites`.
+
 
 ### Sandbox / production (existing data model)
 ```bash
