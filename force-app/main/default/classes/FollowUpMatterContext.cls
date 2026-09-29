@@ -5,6 +5,8 @@
  */
 public with sharing class FollowUpMatterContext {
     public Matter__c matter;
+    /** Client record loaded separately from Client__c to avoid depending on a target-org relationship alias. */
+    public Contact clientRecord;
     /** Most recent non-excluded treatment on or before the evaluation date. */
     public Date lastTreatmentDate;
     /** Earliest non-excluded treatment scheduled after the evaluation date. */
@@ -23,7 +25,7 @@ public with sharing class FollowUpMatterContext {
     }
 
     public Contact client() {
-        return matter.Client__c == null ? null : matter.Client__r;
+        return clientRecord;
     }
 
     /** Sign-up date, falling back to the matter creation date when sign-up is not recorded. */
