@@ -1,10 +1,6 @@
 {
   "packageDirectories": [
     {
-      "path": "prerequisites",
-      "default": false
-    },
-    {
       "path": "force-app",
       "default": true
     },
