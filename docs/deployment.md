@@ -79,3 +79,10 @@ sf project deploy start --source-dir agentforce --target-org pi-uat --test-level
 `.github/workflows/ci.yml` runs on every push to non-main branches and on pull requests:
 - Prettier (parses every Apex class), ESLint, LWC Jest, `sf project convert source` for all package directories, and PMD (fails on High severity).
 - `validate-deploy` runs `sf project deploy validate --test-level RunLocalTests` against an org **only if** the repository secret `SF_AUTH_URL` (an SFDX auth URL for a sandbox) is configured. Otherwise it is skipped with a notice.
+
+
+## 7.1 Optional approved-message scheduler
+
+After the nightly evaluator, optionally schedule FollowUpApprovedSendScheduler. It sends only external recommendations already approved by a human and whose Recommended_Date__c is due. Manual Send from the Work Queue remains available. Do not schedule it when the firm's process requires a human to click Send for every communication.
+
+The automation user must have the Follow_Up_Send_Communications custom permission and the Send Custom Notifications user permission when in-app recommendation notifications are enabled.
