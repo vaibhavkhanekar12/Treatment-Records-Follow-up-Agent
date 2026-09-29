@@ -97,7 +97,7 @@ elseif (-not $SkipPrerequisites) {
         -FailureMessage 'Required supporting data object deployment failed. Main package deployment was not started.'
 }
 else {
-    Write-Host 'Stage 1/3: skipping prerequisite objects (-SkipPrerequisites).' -ForegroundColor Yellow
+    Write-Host 'Stage 1/4: skipping prerequisites (-SkipPrerequisites).' -ForegroundColor Yellow
 }
 
 Write-Host 'Stage 3/4: deploying Follow-up Custom Metadata Types...' -ForegroundColor Cyan
