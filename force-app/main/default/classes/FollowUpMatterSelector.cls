@@ -160,21 +160,25 @@ public with sharing class FollowUpMatterSelector {
         }
         Set<Id> clientIds = byClient.keySet();
         String outboundPattern = OUTBOUND_TASK_PREFIX + '%';
-        for (AggregateResult row : [
-            SELECT WhoId clientId, MAX(CompletedDateTime) lastCompleted, MAX(ActivityDate) lastActivity
+        // ActivityDate is a special Task field that cannot be used with MAX() in SOQL.
+        // Query the task rows and calculate the latest contact date in Apex instead.
+        Map<Id, Date> latestContactByClient = new Map<Id, Date>();
+        for (Task task : [
+            SELECT WhoId, CompletedDateTime, ActivityDate
             FROM Task
             WHERE WhoId IN :clientIds AND IsClosed = TRUE AND (NOT Subject LIKE :outboundPattern)
-            GROUP BY WhoId
         ]) {
-            Datetime lastCompleted = (Datetime) row.get('lastCompleted');
-            Date lastActivity = (Date) row.get('lastActivity');
-            // CompletedDateTime is authoritative; ActivityDate (a due date) is only a fallback for legacy Tasks.
-            Date lastContact = lastCompleted != null ? lastCompleted.date() : lastActivity;
-            if (lastContact != null && lastContact > today) {
-                lastContact = today;
+            Date candidate = task.CompletedDateTime != null ? task.CompletedDateTime.date() : task.ActivityDate;
+            if (candidate == null) continue;
+            if (candidate > today) candidate = today;
+            Date existing = latestContactByClient.get(task.WhoId);
+            if (existing == null || candidate > existing) {
+                latestContactByClient.put(task.WhoId, candidate);
             }
-            for (FollowUpMatterContext ctx : byClient.get((Id) row.get('clientId'))) {
-                ctx.lastClientContactDate = lastContact;
+        }
+        for (Id clientId : latestContactByClient.keySet()) {
+            for (FollowUpMatterContext ctx : byClient.get(clientId)) {
+                ctx.lastClientContactDate = latestContactByClient.get(clientId);
             }
         }
     }
