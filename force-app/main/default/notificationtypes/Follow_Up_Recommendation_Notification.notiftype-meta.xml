@@ -3,5 +3,6 @@
     <customNotifTypeName>Follow-up Recommendation Notification</customNotifTypeName>
     <description>In-app notification when a new follow-up recommendation requires case-manager review.</description>
     <desktop>true</desktop>
+    <masterLabel>Follow-up Recommendation Notification</masterLabel>
     <mobile>true</mobile>
 </CustomNotificationType>
