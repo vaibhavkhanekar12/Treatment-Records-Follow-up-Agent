@@ -15,15 +15,27 @@
 param(
     [Parameter(Mandatory = $true)]
     [string]$TargetOrg,
-    [int]$Wait = 30
+    [int]$Wait = 30,
+
+    # Use this only for a scratch/developer org that is missing the entire sample
+    # Matter/Treatment Event/Records Request/Medical Provider data model.
+    [switch]$DeployFullPrerequisites
 )
 
 $ErrorActionPreference = 'Stop'
 
-Write-Host "Deploying prerequisite metadata to $TargetOrg..." -ForegroundColor Cyan
-sf project deploy start --source-dir prerequisites --target-org $TargetOrg --wait $Wait
+if ($DeployFullPrerequisites) {
+    Write-Host "Deploying full sample prerequisite data model to $TargetOrg..." -ForegroundColor Cyan
+    sf project deploy start --source-dir prerequisites --target-org $TargetOrg --wait $Wait
+} else {
+    # The current Personal Injury org errors are caused by these two missing objects.
+    # Deploy only these dependencies so an existing Matter/Treatment Event model is
+    # not overwritten by the sample prerequisite package.
+    Write-Host "Deploying missing Medical Provider and Records Request dependencies..." -ForegroundColor Cyan
+    sf project deploy start --metadata CustomObject:Medical_Provider__c --metadata CustomObject:Records_Request__c --target-org $TargetOrg --wait $Wait
+}
 if ($LASTEXITCODE -ne 0) {
-    throw "Prerequisite deployment failed. Main package deployment was not started."
+    throw "Prerequisite dependency deployment failed. Main package deployment was not started."
 }
 
 Write-Host "Prerequisites deployed successfully. Deploying solution configuration types..." -ForegroundColor Cyan
