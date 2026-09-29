@@ -227,3 +227,19 @@ Then walk through the UAT script in [testing.md](testing.md) section 5.
 | AI draft shows "withheld" rationale | Output contained a restricted term | Expected; review the template draft or tune the restricted terms |
 | Many "Unclear" classifications | Keywords don't match the firm's phrasing | Add keywords (step 3) or enable AI classification (step 11) |
 | Duplicate follow-ups | Another automation (3.2, legacy Flow) also chases providers | Deactivate the overlapping rule or automation |
+
+
+## 14. Notifications and scheduled delivery
+
+New recommendations can generate an internal Salesforce Custom Notification targeted to the assigned case manager and the Matter record. This is an internal alert only; it does not contact the client or provider. The automation user requires the Salesforce **Send Custom Notifications** user permission.
+
+For approved external recommendations, the optional FollowUpApprovedSendScheduler runs a separate batch and calls the same FollowUpSendService used by the Work Queue. Only records already in Approved status and due by Recommended_Date__c are eligible. The automation user therefore needs the existing Follow_Up_Send_Communications custom permission. This preserves the human approval requirement while allowing approved messages to be sent on a schedule.
+
+Run once as the dedicated automation user:
+
+```apex
+FollowUpNightlyScheduler.schedule(null);
+FollowUpApprovedSendScheduler.schedule(null);
+```
+
+Keep the approved-send scheduler disabled when the firm wants every approved message to be sent manually from the Work Queue.
