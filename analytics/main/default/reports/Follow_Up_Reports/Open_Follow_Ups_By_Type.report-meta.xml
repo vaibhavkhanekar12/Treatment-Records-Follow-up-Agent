@@ -27,7 +27,6 @@
             <operator>equals</operator>
             <value>Pending_Review,Approved,Send_Failed</value>
         </criteriaItems>
-        <language>en_US</language>
     </filter>
     <format>Summary</format>
     <groupingsDown>
