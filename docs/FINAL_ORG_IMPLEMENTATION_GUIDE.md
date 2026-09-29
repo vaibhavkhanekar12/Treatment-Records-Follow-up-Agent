@@ -344,3 +344,22 @@ The system should operate as a controlled case-management assistant:
 **Detect -> Recommend -> Notify -> Draft -> Human Approve -> Send -> Record -> Classify -> Re-check/Escalate**
 
 The Agentforce conversational layer should help employees understand and act on the deterministic follow-up workflow, while server-side automation remains responsible for eligibility, approval enforcement, delivery controls and auditability.
+## 17. Deployment compatibility notes
+
+The repository has been aligned with the Salesforce CLI source metadata requirements identified during target-org deployment validation:
+
+- `sfdx-project.json` contains only package directories that exist in the repository.
+- The Custom Notification Type uses the Salesforce source suffix `notiftype-meta.xml` and includes the required `masterLabel`.
+- Task contact recency is calculated in Apex instead of using `MAX(ActivityDate)` in SOQL.
+- The scheduled approved-message batch does not filter the long-text `Draft_Message__c` field in SOQL.
+- The Prompt Builder Apex provider does not use the retired Flex `CapabilityType` binding.
+- Analytics report filter language metadata has been removed to avoid an unnecessary Translation Workbench dependency.
+- The Stalled Matters report no longer references the unsupported `Matter__c$CreatedDate` custom time-frame filter.
+- Dashboard Metric components include indicator color metadata.
+- The LWC console does not reference the internal `--lwc-fontFamilyMonospace` token.
+
+Recommended deployment command:
+
+    sf project deploy start --source-dir force-app --source-dir agentforce --source-dir analytics --target-org Personal_Injury_Org --wait 30
+
+These repository changes address the source/metadata errors identified during deployment. A successful deployment still depends on the target org's available features, metadata, permissions, existing configuration, and Salesforce API behavior. Target-org deployment and Apex tests must be run before production activation.
