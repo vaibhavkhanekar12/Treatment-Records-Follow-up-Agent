@@ -344,15 +344,3 @@ The system should operate as a controlled case-management assistant:
 **Detect -> Recommend -> Notify -> Draft -> Human Approve -> Send -> Record -> Classify -> Re-check/Escalate**
 
 The Agentforce conversational layer should help employees understand and act on the deterministic follow-up workflow, while server-side automation remains responsible for eligibility, approval enforcement, delivery controls and auditability.
-
-
-## 17. Target-org compatibility fixes applied
-
-The updated branch includes fixes identified during deployment validation:
-
-- Removed the retired Prompt Builder Flex `CapabilityType` from `FollowUpPromptFacts`. Salesforce now recommends using the Apex class directly as a Prompt Builder resource instead of the retired Flex capability binding.
-- Reworked Task contact-date calculation so `ActivityDate` is not used with SOQL `MAX()`; the latest contact date is calculated in Apex. Salesforce documents aggregate support generally, while Task ActivityDate specifically has limitations with aggregate functions.
-- Removed report `<language>en_US</language>` metadata so reports do not require a matching Translation Workbench language configuration in the target org. The deployment error `filterlanguage: Invalid value specified: 1` is associated with report filter-language/org configuration.
-- Removed the invalid CreatedDate time-frame dependency from the Stalled Matters report.
-- Added dashboard indicator colors required by Salesforce for Metric components.
-- Changed the approved-message batch so the long-text `Draft_Message__c` field is not used in a SOQL filter; records are filtered for a nonblank draft in Apex.

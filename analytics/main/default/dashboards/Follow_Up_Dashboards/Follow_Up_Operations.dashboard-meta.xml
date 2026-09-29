@@ -10,9 +10,6 @@
             <dashboardComponent>
                 <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
                 <componentType>Metric</componentType>
-                <indicatorHighColor>#54C254</indicatorHighColor>
-                <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
-                <indicatorLowColor>#C25454</indicatorLowColor>
                 <displayUnits>Integer</displayUnits>
                 <header>Pending approvals</header>
                 <report>Follow_Up_Reports/Pending_Approvals</report>
@@ -26,9 +23,6 @@
             <dashboardComponent>
                 <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
                 <componentType>Metric</componentType>
-                <indicatorHighColor>#54C254</indicatorHighColor>
-                <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
-                <indicatorLowColor>#C25454</indicatorLowColor>
                 <displayUnits>Integer</displayUnits>
                 <header>Stalled matters</header>
                 <report>Follow_Up_Reports/Stalled_Matters</report>
@@ -42,9 +36,6 @@
             <dashboardComponent>
                 <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
                 <componentType>Metric</componentType>
-                <indicatorHighColor>#54C254</indicatorHighColor>
-                <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
-                <indicatorLowColor>#C25454</indicatorLowColor>
                 <displayUnits>Integer</displayUnits>
                 <header>Provider escalations (90 days)</header>
                 <report>Follow_Up_Reports/Provider_Escalations</report>
