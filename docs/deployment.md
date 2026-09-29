@@ -49,13 +49,14 @@ Or from Command Prompt:
 scripts\deploy-personal-injury.cmd Personal_Injury_Org
 ```
 
-The script performs three separate deployments and stops immediately if a stage fails:
+The target Personal Injury org is expected to already have only `Matter__c`. The script performs four separate deployments and stops immediately if a stage fails:
 
-1. `Medical_Provider__c` + `Records_Request__c`
-2. `Follow_Up_Rule__mdt` + `Follow_Up_Setting__mdt` + `Response_Classification_Rule__mdt`
-3. `force-app` + `agentforce` + `analytics`
+1. Required fields on the existing `Matter__c`
+2. Creates `Medical_Provider__c`, `Records_Request__c`, and `Treatment_Event__c`
+3. `Follow_Up_Rule__mdt` + `Follow_Up_Setting__mdt` + `Response_Classification_Rule__mdt`
+4. `force-app` + `agentforce` + `analytics`
 
-This ordering is intentional because Salesforce documents that dependent package directories sometimes need to be deployed sequentially rather than as one transaction. Use `-DeployFullPrerequisites` only for a scratch/developer org missing the entire sample Matter / Treatment Event / Records Request / Medical Provider model. If the target org already has the prerequisite objects with compatible APIs, use `-SkipPrerequisites`.
+The script never deploys the sample `Matter__c` object definition in the normal Personal Injury path, so the existing Matter data model is not replaced. This ordering is intentional because Salesforce recommends separating metadata deployments when dependencies exist. Use `-DeployFullPrerequisites` only for a scratch/developer org that genuinely needs the complete sample data model.
 
 
 ### Sandbox / production (existing data model)
