@@ -24,7 +24,6 @@
             <operator>equals</operator>
             <value>1</value>
         </criteriaItems>
-        <language>en_US</language>
     </filter>
     <format>Summary</format>
     <groupingsDown>
@@ -42,8 +41,4 @@
     <showDetails>true</showDetails>
     <showGrandTotal>true</showGrandTotal>
     <showSubTotals>true</showSubTotals>
-    <timeFrameFilter>
-        <dateColumn>Matter__c$CreatedDate</dateColumn>
-        <interval>INTERVAL_CUSTOM</interval>
-    </timeFrameFilter>
 </Report>
