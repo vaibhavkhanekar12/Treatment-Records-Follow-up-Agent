@@ -80,7 +80,7 @@ For the Personal Injury org on Windows, use the ordered deployment script:
 .\\scripts\\deploy-personal-injury.ps1 -TargetOrg Personal_Injury_Org
 ```
 
-The script stops if the prerequisite deployment fails, preventing cascading `Medical_Provider__c`, `Records_Request__c`, custom metadata, and dependent Apex compiler errors.
+The script performs three ordered deployments—prerequisite objects, solution-owned Custom Metadata Types, then the dependent solution—and stops immediately if any stage fails. This prevents cascading `Medical_Provider__c`, `Records_Request__c`, `Response_Classification_Rule__mdt`, and dependent Apex compiler errors.
 
 If the target org already has those objects, skip `prerequisites/` and follow `docs/deployment.md` to map the existing data model before deploying the solution.
 
