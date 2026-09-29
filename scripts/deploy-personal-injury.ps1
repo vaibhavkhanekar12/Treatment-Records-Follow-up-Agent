@@ -64,8 +64,8 @@ elseif (-not $SkipPrerequisites) {
     Invoke-SfDeploy `
         -Arguments @(
             'project', 'deploy', 'start',
-            '--metadata', 'CustomObject:Medical_Provider__c',
-            '--metadata', 'CustomObject:Records_Request__c',
+            '--source-dir', 'prerequisites/main/default/objects/Medical_Provider__c',
+            '--source-dir', 'prerequisites/main/default/objects/Records_Request__c',
             '--target-org', $TargetOrg,
             '--wait', $Wait
         ) `
@@ -82,9 +82,9 @@ Write-Host 'Stage 2/3: deploying Follow-up Custom Metadata Types...' -Foreground
 Invoke-SfDeploy `
     -Arguments @(
         'project', 'deploy', 'start',
-        '--metadata', 'CustomObject:Follow_Up_Rule__mdt',
-        '--metadata', 'CustomObject:Follow_Up_Setting__mdt',
-        '--metadata', 'CustomObject:Response_Classification_Rule__mdt',
+        '--source-dir', 'force-app/main/default/objects/Follow_Up_Rule__mdt',
+        '--source-dir', 'force-app/main/default/objects/Follow_Up_Setting__mdt',
+        '--source-dir', 'force-app/main/default/objects/Response_Classification_Rule__mdt',
         '--target-org', $TargetOrg,
         '--wait', $Wait
     ) `
