@@ -86,3 +86,20 @@ sf project deploy start --source-dir agentforce --target-org pi-uat --test-level
 After the nightly evaluator, optionally schedule FollowUpApprovedSendScheduler. It sends only external recommendations already approved by a human and whose Recommended_Date__c is due. Manual Send from the Work Queue remains available. Do not schedule it when the firm's process requires a human to click Send for every communication.
 
 The automation user must have the Follow_Up_Send_Communications custom permission and the Send Custom Notifications user permission when in-app recommendation notifications are enabled.
+## 8. Personal Injury requirement alignment
+
+The implementation is intentionally mapped to the Treatment & Records Follow-up use case:
+
+- Daily monitoring: FollowUpNightlyScheduler → FollowUpEvaluationBatch → FollowUpEvaluationService.
+- Treatment gaps: Follow_Up_Rule.Treatment_Gap compares the latest treatment/sign-up anchor with today and creates an approval-controlled client check-in.
+- Records follow-up: Follow_Up_Rule.Records_Follow_Up tracks request age and repeat cadence.
+- Second provider miss escalation: Follow_Up_Rule.Provider_Escalation escalates after two sent provider follow-ups and automatically creates an internal case-manager Task.
+- Missing bills: the rule engine checks treatment events against bill-request activity.
+- Client contact recency: completed client Tasks are included in matter facts and the stalled condition.
+- Stalled/at-risk matters: treatment, records activity and client-contact staleness are combined into a rule-based stalled-risk signal and persisted to Matter__c.Stalled__c / Stalled_Since__c.
+- Monthly client status: Client_Status_Update creates a plain-language client update recommendation on a configurable cadence.
+- Human-in-the-loop: external recommendations remain pending review until an authorized case manager approves them; bulk approval is restricted to eligible template drafts.
+- Scheduled sending: FollowUpApprovedSendScheduler sends only due recommendations already in Approved status.
+- Audit: approval, send, delivery, response classification and follow-up dates remain on Follow_Up_Recommendation__c.
+- ROI data: Gap_Days__c and Records_Age_Days__c support treatment-gap and records-delay KPI reporting; the reporting layer should be mapped to the firm's actual data model before production rollout.
+- AI boundaries: AI is limited to drafting, summarization/rationale and inbound classification. Eligibility and escalation decisions remain deterministic.
