@@ -109,10 +109,13 @@ public with sharing class FollowUpEvaluationService {
         }
         List<Database.SaveResult> results = Database.insert(recs, false, AccessLevel.SYSTEM_MODE);
         List<FollowUpRuleEngine.Candidate> needTasks = new List<FollowUpRuleEngine.Candidate>();
+        List<Follow_Up_Recommendation__c> createdForNotification = new List<Follow_Up_Recommendation__c>();
         for (Integer i = 0; i < results.size(); i++) {
             if (results[i].isSuccess()) {
                 summary.created++;
                 summary.createdIds.add(results[i].getId());
+                recs[i].Id = results[i].getId();
+                createdForNotification.add(recs[i]);
                 if (candidates[i].autoCreateTask) {
                     needTasks.add(candidates[i]);
                 }
@@ -125,6 +128,7 @@ public with sharing class FollowUpEvaluationService {
             }
         }
         createAssignedTasks(needTasks, summary);
+        FollowUpNotificationService.notifyCaseManagers(createdForNotification);
     }
 
     /** Internal escalations configured with Auto_Create_Task__c are assigned immediately (no approval needed). */
