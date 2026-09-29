@@ -23,7 +23,6 @@ public with sharing class FollowUpPromptFacts {
     @InvocableMethod(
         label='Follow-up Prompt Facts'
         description='Verified, Id-free matter and recommendation facts for Treatment & Records Follow-up prompt templates.'
-        CapabilityType='PromptTemplateType://einstein_gpt__flex'
     )
     public static List<Response> getFacts(List<Request> requests) {
         Set<Id> recIds = new Set<Id>();
@@ -37,7 +36,7 @@ public with sharing class FollowUpPromptFacts {
         );
         Set<Id> matterIds = new Set<Id>();
         for (Follow_Up_Recommendation__c rec : recs.values()) {
-            matterIds.add(rec.Matter__c);
+            if (rec.Matter__c != null) matterIds.add(rec.Matter__c);
         }
         Date today = Date.today();
         Map<Id, FollowUpMatterContext> contexts = new Map<Id, FollowUpMatterContext>();
@@ -54,9 +53,9 @@ public with sharing class FollowUpPromptFacts {
             } else {
                 FollowUpMatterContext ctx = contexts.get(rec.Matter__c);
                 response.Prompt =
-                    'MATTER FACTS\n' +
+                    'MATTER FACTS\\n' +
                     (ctx == null ? Label.FollowUp_Not_Recorded : FollowUpFactsBuilder.matterFacts(ctx, today)) +
-                    '\n\nFOLLOW-UP FACTS\n' +
+                    '\\n\\nFOLLOW-UP FACTS\\n' +
                     FollowUpFactsBuilder.recommendationFacts(rec, ctx);
             }
             responses.add(response);
