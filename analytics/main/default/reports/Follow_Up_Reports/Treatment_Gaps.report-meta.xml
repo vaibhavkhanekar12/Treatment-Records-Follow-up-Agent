@@ -28,7 +28,6 @@
             <operator>equals</operator>
             <value>Client_Check_In,Treatment_Gap_Review</value>
         </criteriaItems>
-        <language>en_US</language>
     </filter>
     <format>Summary</format>
     <groupingsDown>
