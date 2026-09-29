@@ -103,3 +103,18 @@ The implementation is intentionally mapped to the Treatment & Records Follow-up 
 - Audit: approval, send, delivery, response classification and follow-up dates remain on Follow_Up_Recommendation__c.
 - ROI data: Gap_Days__c and Records_Age_Days__c support treatment-gap and records-delay KPI reporting; the reporting layer should be mapped to the firm's actual data model before production rollout.
 - AI boundaries: AI is limited to drafting, summarization/rationale and inbound classification. Eligibility and escalation decisions remain deterministic.
+
+## 9. Missing prerequisite objects during deployment
+
+If deployment errors show invalid or missing types such as Medical_Provider__c or Records_Request__c, do not treat the resulting Apex errors as independent defects. First confirm the target org's data model.
+
+- If the target org already has these objects, map the repository fields to the existing objects and deploy only force-app / analytics / agentforce.
+- If the target org does not have the required objects, deploy prerequisites first:
+
+    sf project deploy start --source-dir prerequisites --target-org Personal_Injury_Org --wait 30
+
+Then deploy the solution:
+
+    sf project deploy start --source-dir force-app --source-dir agentforce --source-dir analytics --target-org Personal_Injury_Org --wait 30
+
+The prerequisite directory is intentionally separated because those object definitions are sample/minimal data-model components and must not overwrite an established firm's production data model.
