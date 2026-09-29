@@ -358,4 +358,12 @@
         <object>Follow_Up_Recommendation__c</object>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>SendCustomNotifications</name>
+    </userPermissions>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>Follow_Up_Send_Communications</name>
+    </customPermissions>
 </PermissionSet>
