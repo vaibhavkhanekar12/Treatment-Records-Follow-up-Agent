@@ -7,8 +7,9 @@
 # Usage:
 #   .\scripts\deploy-personal-injury.ps1 -TargetOrg Personal_Injury_Org
 #
-# If the target org already has Medical_Provider__c and Records_Request__c with
-# compatible fields, use -SkipPrerequisites.
+# The target org is expected to already contain Matter__c. This script adds only the
+# required Matter fields plus the supporting Treatment_Event__c, Records_Request__c,
+# and Medical_Provider__c objects; it never deploys the sample Matter__c object definition.
 #
 # For a scratch/developer org missing the complete sample data model:
 #   .\scripts\deploy-personal-injury.ps1 -TargetOrg <alias> -DeployFullPrerequisites
@@ -59,17 +60,32 @@ if ($DeployFullPrerequisites) {
         -FailureMessage 'Full prerequisite deployment failed. Main package deployment was not started.'
 }
 elseif (-not $SkipPrerequisites) {
-    Write-Host 'Stage 1/3: deploying Medical_Provider__c and Records_Request__c...' -ForegroundColor Cyan
+    Write-Host 'Stage 1/3: deploying required Matter fields and supporting data objects...' -ForegroundColor Cyan
+
+    # The target org already has Matter__c, but it does not have the fields/data
+    # objects required by this solution. Deploy only the required Matter fields
+    # (never the sample Matter object definition) plus the three solution data objects.
+    $matterFields = @(
+        'prerequisites/main/default/objects/Matter__c/fields/Case_Manager__c.field-meta.xml',
+        'prerequisites/main/default/objects/Matter__c/fields/Client__c.field-meta.xml',
+        'prerequisites/main/default/objects/Matter__c/fields/Demand_Sent_Date__c.field-meta.xml',
+        'prerequisites/main/default/objects/Matter__c/fields/Practice_Area__c.field-meta.xml',
+        'prerequisites/main/default/objects/Matter__c/fields/Sign_Up_Date__c.field-meta.xml',
+        'prerequisites/main/default/objects/Matter__c/fields/Status__c.field-meta.xml'
+    )
+
+    $deployArgs = @('project', 'deploy', 'start')
+    foreach ($field in $matterFields) {
+        $deployArgs += @('--source-dir', $field)
+    }
+    $deployArgs += @('--source-dir', 'prerequisites/main/default/objects/Medical_Provider__c')
+    $deployArgs += @('--source-dir', 'prerequisites/main/default/objects/Records_Request__c')
+    $deployArgs += @('--source-dir', 'prerequisites/main/default/objects/Treatment_Event__c')
+    $deployArgs += @('--target-org', $TargetOrg, '--wait', $Wait)
 
     Invoke-SfDeploy `
-        -Arguments @(
-            'project', 'deploy', 'start',
-            '--source-dir', 'prerequisites/main/default/objects/Medical_Provider__c',
-            '--source-dir', 'prerequisites/main/default/objects/Records_Request__c',
-            '--target-org', $TargetOrg,
-            '--wait', $Wait
-        ) `
-        -FailureMessage 'Required prerequisite object deployment failed. Main package deployment was not started.'
+        -Arguments $deployArgs `
+        -FailureMessage 'Required Matter fields or supporting data object deployment failed. Main package deployment was not started.'
 }
 else {
     Write-Host 'Stage 1/3: skipping prerequisite objects (-SkipPrerequisites).' -ForegroundColor Yellow
