@@ -37,13 +37,13 @@ sf apex run test --target-org pi-dev --test-level RunLocalTests --code-coverage 
 
 ### Personal Injury org — one-command ordered deployment (Windows PowerShell)
 
-If the target org does **not** already contain the repository's prerequisite objects:
+If the target Personal Injury org is missing `Medical_Provider__c` and `Records_Request__c` (the dependencies shown in the deployment errors):
 
 ```powershell
 .\scripts\deploy-personal-injury.ps1 -TargetOrg Personal_Injury_Org
 ```
 
-The script performs three ordered deployments and stops if any stage fails: (1) prerequisite data-model objects, (2) Follow-up Custom Metadata Types, and (3) the dependent solution. This prevents the cascading `Medical_Provider__c`, `Records_Request__c`, `Response_Classification_Rule__mdt`, and dependent Apex compiler errors shown when the main package is deployed before its dependencies.
+The script performs three ordered deployments and stops if any stage fails: (1) the missing Medical Provider / Records Request dependencies, (2) Follow-up Custom Metadata Types, and (3) the dependent solution. Use `-DeployFullPrerequisites` only for a scratch/developer org that is missing the entire sample Matter / Treatment Event / Records Request / Medical Provider data model. This prevents the cascading `Medical_Provider__c`, `Records_Request__c`, `Response_Classification_Rule__mdt`, and dependent Apex compiler errors shown in the deployment.
 
 ### Sandbox / production (existing data model)
 ```bash
@@ -138,7 +138,7 @@ Run the ordered deployment script:
 .\scripts\deploy-personal-injury.ps1 -TargetOrg Personal_Injury_Org
 ```
 
-Or run the two data-model/solution deployments manually:
+Or run the three ordered deployments manually:
 
 ```bash
 sf project deploy start --metadata CustomObject:Medical_Provider__c --metadata CustomObject:Records_Request__c --target-org Personal_Injury_Org --wait 30
@@ -146,7 +146,7 @@ sf project deploy start --metadata CustomObject:Follow_Up_Rule__mdt --metadata C
 sf project deploy start --source-dir force-app --source-dir agentforce --source-dir analytics --target-org Personal_Injury_Org --wait 30
 ```
 
-**Do not** run the second command if the first command failed.
+**Do not** continue to the next command if the previous command failed.
 
 ### If the target org already has those objects
 
