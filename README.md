@@ -72,7 +72,7 @@ AI is used for drafting, rationale and inbound classification only. Eligibility 
 
 ## Deployment
 
-If the target org does not already contain the repository's prerequisite data model, deploy it **first**, then deploy the solution. Do not deploy the sample prerequisite objects into an established org that already has its own Matter / Treatment Event / Records Request / Medical Provider data model.
+If the target Personal Injury org is missing `Medical_Provider__c` and `Records_Request__c` (the dependencies shown in the current deployment errors), deploy those dependencies **first**, then deploy the solution. Do not deploy the full sample prerequisite data model into an established org that already has its own Matter / Treatment Event / Records Request / Medical Provider objects.
 
 For the Personal Injury org on Windows, use the ordered deployment script:
 
@@ -80,7 +80,7 @@ For the Personal Injury org on Windows, use the ordered deployment script:
 .\\scripts\\deploy-personal-injury.ps1 -TargetOrg Personal_Injury_Org
 ```
 
-The script performs three ordered deployments—prerequisite objects, solution-owned Custom Metadata Types, then the dependent solution—and stops immediately if any stage fails. This prevents cascading `Medical_Provider__c`, `Records_Request__c`, `Response_Classification_Rule__mdt`, and dependent Apex compiler errors.
+The script performs three ordered deployments—missing Medical Provider / Records Request dependencies, solution-owned Custom Metadata Types, then the dependent solution—and stops immediately if any stage fails. For a scratch/developer org missing the entire sample data model, add `-DeployFullPrerequisites`. This prevents cascading `Medical_Provider__c`, `Records_Request__c`, `Response_Classification_Rule__mdt`, and dependent Apex compiler errors.
 
 If the target org already has those objects, skip `prerequisites/` and follow `docs/deployment.md` to map the existing data model before deploying the solution.
 
