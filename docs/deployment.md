@@ -43,7 +43,7 @@ If the target org does **not** already contain the repository's prerequisite obj
 .\scripts\deploy-personal-injury.ps1 -TargetOrg Personal_Injury_Org
 ```
 
-The script performs two separate deployments and stops if the prerequisite deployment fails. This prevents the cascading `Medical_Provider__c`, `Records_Request__c`, and dependent Apex compiler errors shown when the main package is deployed before its data-model dependencies.
+The script performs three ordered deployments and stops if any stage fails: (1) prerequisite data-model objects, (2) Follow-up Custom Metadata Types, and (3) the dependent solution. This prevents the cascading `Medical_Provider__c`, `Records_Request__c`, `Response_Classification_Rule__mdt`, and dependent Apex compiler errors shown when the main package is deployed before its dependencies.
 
 ### Sandbox / production (existing data model)
 ```bash
