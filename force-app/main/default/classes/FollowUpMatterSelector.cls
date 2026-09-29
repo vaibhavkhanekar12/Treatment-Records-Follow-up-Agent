@@ -35,14 +35,6 @@ public with sharing class FollowUpMatterSelector {
                 Case_Manager__r.Name,
                 Case_Manager__r.FirstName,
                 Client__c,
-                Client__r.FirstName,
-                Client__r.LastName,
-                Client__r.Name,
-                Client__r.Email,
-                Client__r.MobilePhone,
-                Client__r.Phone,
-                Client__r.Birthdate,
-                Client__r.HasOptedOutOfEmail,
                 Stalled__c,
                 Stalled_Since__c
             FROM Matter__c
@@ -54,6 +46,8 @@ public with sharing class FollowUpMatterSelector {
         if (ids.isEmpty()) {
             return byMatter.values();
         }
+
+        loadClients(byMatter.values());
 
         Set<String> excluded = withSentinel(FollowUpConfig.excludedTreatmentStatuses());
         Set<Id> providerIds = new Set<Id>();
@@ -143,6 +137,30 @@ public with sharing class FollowUpMatterSelector {
     public static FollowUpMatterContext loadContext(Id matterId, Date today) {
         List<FollowUpMatterContext> contexts = loadContexts(new Set<Id>{ matterId }, today);
         return contexts.isEmpty() ? null : contexts[0];
+    }
+
+    private static void loadClients(List<FollowUpMatterContext> contexts) {
+        Set<Id> clientIds = new Set<Id>();
+        for (FollowUpMatterContext ctx : contexts) {
+            if (ctx.matter.Client__c != null) {
+                clientIds.add(ctx.matter.Client__c);
+            }
+        }
+        if (clientIds.isEmpty()) {
+            return;
+        }
+
+        Map<Id, Contact> clients = new Map<Id, Contact>([
+            SELECT Id, FirstName, LastName, Name, Email, MobilePhone, Phone, Birthdate, HasOptedOutOfEmail
+            FROM Contact
+            WHERE Id IN :clientIds
+        ]);
+
+        for (FollowUpMatterContext ctx : contexts) {
+            if (ctx.matter.Client__c != null) {
+                ctx.clientRecord = clients.get(ctx.matter.Client__c);
+            }
+        }
     }
 
     private static void loadClientContact(List<FollowUpMatterContext> contexts, Date today) {
