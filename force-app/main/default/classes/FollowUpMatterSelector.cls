@@ -151,7 +151,7 @@ public with sharing class FollowUpMatterSelector {
         }
 
         Map<Id, Contact> clients = new Map<Id, Contact>([
-            SELECT Id, FirstName, LastName, Name, Email, MobilePhone, Phone, Birthdate, HasOptedOutOfEmail
+            SELECT Id, FirstName, LastName, Name, Email, MobilePhone, Phone, Birthdate
             FROM Contact
             WHERE Id IN :clientIds
         ]);
