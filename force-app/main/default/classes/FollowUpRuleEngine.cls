@@ -434,7 +434,7 @@ public with sharing class FollowUpRuleEngine {
     /** Preferred channel when the client has an address for it; otherwise SMS, then Email, then a phone call script. */
     @TestVisible
     private static String clientChannel(Contact client, String preferred) {
-        Boolean hasEmail = String.isNotBlank(client.Email) && client.HasOptedOutOfEmail != true;
+        Boolean hasEmail = String.isNotBlank(client.Email);
         Boolean hasMobile = String.isNotBlank(client.MobilePhone);
         List<String> order = new List<String>{ preferred, FollowUpConstants.CHANNEL_SMS, FollowUpConstants.CHANNEL_EMAIL };
         for (String channel : order) {
