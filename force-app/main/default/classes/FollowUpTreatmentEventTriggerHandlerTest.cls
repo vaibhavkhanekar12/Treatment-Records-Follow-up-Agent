@@ -2,8 +2,13 @@
 private class FollowUpTreatmentEventTriggerHandlerTest {
     @IsTest
     static void insertsQueueableForNewTreatmentEvent() {
-        Matter__c matter = FollowUpTestDataFactory.createMatter();
-        Medical_Provider__c provider = FollowUpTestDataFactory.createProvider();
+        FollowUpTestDataFactory.useDefaultConfig();
+        Contact client = FollowUpTestDataFactory.client(null, 'treatment-trigger@example.com', '5550101');
+        insert client;
+        Medical_Provider__c provider = FollowUpTestDataFactory.provider('Trigger Test Provider', 'provider@example.com', null);
+        insert provider;
+        Matter__c matter = FollowUpTestDataFactory.matter('TRIGGER-TEST-1', client.Id, UserInfo.getUserId(), Date.today().addDays(-90));
+        insert matter;
 
         Test.startTest();
         Treatment_Event__c eventRecord = new Treatment_Event__c(
@@ -24,8 +29,13 @@ private class FollowUpTreatmentEventTriggerHandlerTest {
 
     @IsTest
     static void updateQueuesOnlyWhenRelevantTreatmentDataChanges() {
-        Matter__c matter = FollowUpTestDataFactory.createMatter();
-        Medical_Provider__c provider = FollowUpTestDataFactory.createProvider();
+        FollowUpTestDataFactory.useDefaultConfig();
+        Contact client = FollowUpTestDataFactory.client(null, 'treatment-trigger-update@example.com', '5550102');
+        insert client;
+        Medical_Provider__c provider = FollowUpTestDataFactory.provider('Trigger Update Provider', 'provider2@example.com', null);
+        insert provider;
+        Matter__c matter = FollowUpTestDataFactory.matter('TRIGGER-TEST-2', client.Id, UserInfo.getUserId(), Date.today().addDays(-90));
+        insert matter;
 
         Treatment_Event__c eventRecord = new Treatment_Event__c(
             Matter__c = matter.Id,
