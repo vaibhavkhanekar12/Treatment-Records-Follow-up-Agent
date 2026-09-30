@@ -15,7 +15,6 @@ public with sharing class FollowUpRecommendationService {
         'Channel__c, Reason__c, Gap_Days__c, Records_Age_Days__c, Prior_Follow_Up_Count__c, Last_Treatment_Date__c, ' +
         'AI_Rationale__c, Draft_Subject__c, Draft_Message__c, Draft_Source__c, Recipient_Contact__c, ' +
         'Recipient_Contact__r.Name, Recipient_Contact__r.Email, Recipient_Contact__r.MobilePhone, ' +
-        'Recipient_Contact__r.HasOptedOutOfEmail, ' +
         'Recipient_Contact__r.Phone, Medical_Provider__c, ' +
         'Medical_Provider__r.Name, Medical_Provider__r.Email__c, Medical_Provider__r.Fax__c, Medical_Provider__r.Phone__c, ' +
         'Records_Request__c, Records_Request__r.Name, Assigned_To__c, Assigned_To__r.Name, Approved_By__c, ' +
