@@ -37,7 +37,7 @@ public without sharing class FollowUpTreatmentTriggerHandler {
         }
 
         if (!matterIds.isEmpty()) {
-            System.enqueueJob(new FollowUpTreatmentEventEvaluationQueueable(matterIds));
+            System.enqueueJob(new FollowUpTreatmentEventEvalQueueable(matterIds));
         }
     }
 }
