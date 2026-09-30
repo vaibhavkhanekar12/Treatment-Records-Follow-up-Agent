@@ -62,6 +62,7 @@
                 <displayUnits>Integer</displayUnits>
                 <header>Open follow-ups by type</header>
                 <legendPosition>Bottom</legendPosition>
+                <sortBy>RowValueDescending</sortBy>
                 <report>Follow_Up_Reports/Open_Follow_Ups_By_Type</report>
                 <useReportChart>false</useReportChart>
             </dashboardComponent>
@@ -78,6 +79,7 @@
                 <displayUnits>Integer</displayUnits>
                 <header>Response rate (90 days)</header>
                 <legendPosition>Bottom</legendPosition>
+                <sortBy>RowValueDescending</sortBy>
                 <report>Follow_Up_Reports/Follow_Up_Response_Rate</report>
                 <useReportChart>false</useReportChart>
             </dashboardComponent>
