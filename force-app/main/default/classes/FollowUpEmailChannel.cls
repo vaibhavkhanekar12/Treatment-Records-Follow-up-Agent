@@ -19,10 +19,6 @@ public with sharing class FollowUpEmailChannel implements IFollowUpChannel {
                     results.add(failure(rec, Label.FollowUp_Error_No_Recipient));
                     continue;
                 }
-                if (client.HasOptedOutOfEmail == true) {
-                    results.add(new FollowUpDeliveryResult(rec.Id, false, Label.FollowUp_Error_Email_Opt_Out));
-                    continue;
-                }
                 message.setTargetObjectId(client.Id);
             } else {
                 String address = rec.Medical_Provider__r == null ? null : rec.Medical_Provider__r.Email__c;
