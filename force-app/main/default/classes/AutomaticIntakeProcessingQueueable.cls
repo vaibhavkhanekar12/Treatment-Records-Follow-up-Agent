@@ -34,6 +34,7 @@ public without sharing class AutomaticIntakeProcessingQueueable implements Queue
             return;
         }
 
+        Savepoint processingSavepoint = Database.setSavepoint();
         try {
             Type extractorType = Type.forName(settings.Extractor_Class__c);
             if (extractorType == null) {
@@ -59,7 +60,8 @@ public without sharing class AutomaticIntakeProcessingQueueable implements Queue
                 update intake;
             }
         } catch (Exception ex) {
-            // Avoid persisting exception text because provider responses can contain sensitive data.
+            // Roll back any partial provider/treatment/records writes before routing the source to review.
+            Database.rollback(processingSavepoint);
             intake.Status__c = 'Needs Review';
             intake.Review_Reason__c = 'Automatic extraction/application failed. Inspect the source and retry after correcting configuration.';
             update intake;
