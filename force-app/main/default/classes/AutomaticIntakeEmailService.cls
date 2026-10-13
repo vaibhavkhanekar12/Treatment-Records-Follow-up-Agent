@@ -109,6 +109,7 @@ global without sharing class AutomaticIntakeEmailService implements Messaging.In
                 }
             }
 
+            System.enqueueJob(new AutomaticIntakeProcessingQueueable(intake.Id));
             result.success = true;
             return result;
         } catch (Exception ex) {
