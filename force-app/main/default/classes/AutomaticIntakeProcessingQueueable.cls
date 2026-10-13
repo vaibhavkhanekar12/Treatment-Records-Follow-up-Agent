@@ -54,6 +54,7 @@ public without sharing class AutomaticIntakeProcessingQueueable implements Queue
                 return;
             }
             payload.intakeId = intake.Id;
+            update new Automatic_Intake__c(Id = intake.Id, Extraction_Confidence__c = payload.confidence);
             AutomaticIntakeService.ApplyResult result =
                 AutomaticIntakeService.applyValidatedPayload(payload);
             // applyValidatedPayload records its own review status/reason when a validation gate fails.
