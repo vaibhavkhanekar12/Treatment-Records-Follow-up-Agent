@@ -11,6 +11,7 @@ private class AutomaticIntakeEmailServiceTest {
         Messaging.InboundEmail.BinaryAttachment attachment =
             new Messaging.InboundEmail.BinaryAttachment();
         attachment.fileName = 'records.pdf';
+        attachment.mimeTypeSubType = 'application/pdf';
         attachment.body = Blob.valueOf('test attachment bytes');
         email.binaryAttachments = new List<Messaging.InboundEmail.BinaryAttachment>{ attachment };
 
