@@ -1,6 +1,6 @@
 # Automatic Intake & Record Creation — Implementation Plan
 
-**Status:** Planning only; no production behavior or existing Apex classes changed.  
+**Status:** Initial code slice implemented on the feature branch; not yet deployed or validated in a Salesforce org.  
 **Source branch:** `updated`  
 **Planning branch:** `feature/automatic-intake-implementation-plan`  
 **Tracking issue:** [#1 — Implement automatic intake and creation of treatment, provider, and records-request records](https://github.com/vaibhavkhanekar12/Treatment-Records-Follow-up-Agent/issues/1)
@@ -158,3 +158,25 @@ Route to review if any gate fails. Confidence alone is never enough to auto-link
 5. What confidence thresholds and reviewer permissions should be configured per document class?
 
 These are discovery gates, not assumptions. The implementation should not claim end-to-end automatic extraction until the required platform capability and org configuration are confirmed.
+
+## 12. Current code status (feature branch)
+
+The following implementation has now been added in code:
+
+- `Automatic_Intake__c` staging object with message-id idempotency key, sender/subject/body metadata, classification, review reason, and optional Matter/provider lookups.
+- `AutomaticIntakeEmailService` inbound Email Service handler that captures the message and attachments as Salesforce Files linked to the intake record. Duplicate message IDs are ignored; attachment visibility follows record-sharing access.
+- `AutomaticIntakeProcessingQueueable` plus `IAutomaticIntakeExtractor` contract and inactive `Automatic_Intake_Extraction_Setting__mdt` configuration. If no approved adapter is configured, the item stays in **Needs Review** rather than creating guessed records.
+- `AutomaticIntakeService` validates a structured candidate and applies high-confidence (>= 0.90), unambiguous payloads to existing Treatment Event or Records Request records, or creates/reuses a provider when sufficient verified provider fields exist. The existing Treatment Event trigger and evaluation queue are reused.
+- `AutomaticIntakeReviewController`, the `automaticIntakeReview` LWC, and an `Automatic Intake Reviewer` permission set for viewing staged items.
+- Apex tests for email capture/idempotency and high/low-confidence application paths.
+
+### Still required before calling this end-to-end complete
+
+1. Implement and configure a concrete `IAutomaticIntakeExtractor` adapter using a document extraction capability that is licensed and enabled in the target org. The default metadata record deliberately keeps extraction disabled.
+2. Confirm target-org object fields, required fields, validation/duplicate rules, and permissions for `Medical_Provider__c`, `Treatment_Event__c`, and `Records_Request__c`.
+3. Configure a Salesforce Email Service address, allowed sender/domain policy, and routing in the target org.
+4. Add reviewer apply/edit/reject controls for human-corrected payloads; the current LWC is a queue/list view and links to each intake record.
+5. Run Salesforce deployment validation and Apex tests in a representative sandbox. No org deployment or test run is claimed by this commit.
+
+The code is intentionally fail-closed: the absence of a configured extractor cannot create a business record from a keyword classification. Outbound communications remain outside this intake flow and retain the existing case-manager approval requirement.
+
