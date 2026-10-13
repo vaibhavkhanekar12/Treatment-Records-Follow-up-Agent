@@ -27,10 +27,11 @@ public without sharing class AutomaticIntakeProcessingQueueable implements Queue
 
         if (settings == null || settings.Active__c != true ||
             String.isBlank(settings.Extractor_Class__c)) {
-            intake.Status__c = 'Needs Review';
-            intake.Review_Reason__c =
-                'Email and attachments were captured. No approved document-extraction adapter is configured; verify extracted fields and Matter/provider matching before applying records.';
-            update intake;
+            update new Automatic_Intake__c(
+                Id = intake.Id,
+                Status__c = 'Needs Review',
+                Review_Reason__c = 'Email and attachments were captured. No approved document-extraction adapter is configured; verify extracted fields and Matter/provider matching before applying records.'
+            );
             return;
         }
 
@@ -55,16 +56,15 @@ public without sharing class AutomaticIntakeProcessingQueueable implements Queue
             payload.intakeId = intake.Id;
             AutomaticIntakeService.ApplyResult result =
                 AutomaticIntakeService.applyValidatedPayload(payload);
-            if (result.needsReview && String.isBlank(intake.Review_Reason__c)) {
-                intake.Review_Reason__c = result.message;
-                update intake;
-            }
+            // applyValidatedPayload records its own review status/reason when a validation gate fails.
         } catch (Exception ex) {
             // Roll back any partial provider/treatment/records writes before routing the source to review.
             Database.rollback(processingSavepoint);
-            intake.Status__c = 'Needs Review';
-            intake.Review_Reason__c = 'Automatic extraction/application failed. Inspect the source and retry after correcting configuration.';
-            update intake;
+            update new Automatic_Intake__c(
+                Id = intake.Id,
+                Status__c = 'Needs Review',
+                Review_Reason__c = 'Automatic extraction/application failed. Inspect the source and retry after correcting configuration.'
+            );
         }
     }
 
