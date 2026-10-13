@@ -101,7 +101,7 @@ global without sharing class AutomaticIntakeEmailService implements Messaging.In
                         ContentDocumentId = version.ContentDocumentId,
                         LinkedEntityId = intake.Id,
                         ShareType = 'V',
-                        Visibility = 'InternalUsers'
+                        Visibility = 'SharedUsers'
                     ));
                 }
                 if (!links.isEmpty()) {
