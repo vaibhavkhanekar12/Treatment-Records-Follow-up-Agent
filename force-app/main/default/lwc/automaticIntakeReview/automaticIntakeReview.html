@@ -1,0 +1,31 @@
+<template>
+    <lightning-card title="Automatic Intake Review" icon-name="standard:email">
+        <div class="slds-p-horizontal_small slds-p-bottom_small">
+            <p class="slds-text-body_small">
+                Inbound emails and attachments are staged here. Confirm Matter/provider matching and extracted fields before applying records.
+            </p>
+        </div>
+        <template if:true={error}>
+            <div class="slds-p-around_small slds-text-color_error" role="alert">
+                Unable to load intake records. Check the Automatic Intake Reviewer permission set and record access.
+            </div>
+        </template>
+        <template if:true={rows}>
+            <lightning-datatable
+                key-field="Id"
+                data={rows}
+                columns={columns}
+                hide-checkbox-column
+                show-row-number-column>
+            </lightning-datatable>
+            <template if:false={hasRows}>
+                <div class="slds-p-around_medium slds-text-align_center">
+                    No intake items currently require review.
+                </div>
+            </template>
+        </template>
+        <div slot="footer" class="slds-text-align_right">
+            <lightning-button label="Refresh" icon-name="utility:refresh" onclick={handleRefresh}></lightning-button>
+        </div>
+    </lightning-card>
+</template>

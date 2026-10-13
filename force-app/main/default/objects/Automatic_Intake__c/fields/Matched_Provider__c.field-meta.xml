@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Matched_Provider__c</fullName>
+    <label>Matched Provider</label>
+    <referenceTo>Medical_Provider__c</referenceTo>
+    <relationshipLabel>Automatic Intake Records</relationshipLabel>
+    <relationshipName>Automatic_Intake_Provider_Intake</relationshipName>
+    <type>Lookup</type>
+</CustomField>
