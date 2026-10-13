@@ -9,7 +9,7 @@
         <allowRead>true</allowRead>
         <modifyAllRecords>false</modifyAllRecords>
         <object>Automatic_Intake__c</object>
-        <viewAllRecords>false</viewAllRecords>
+        <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
     <fieldPermissions><editable>false</editable><field>Automatic_Intake__c.Email_Message_Id__c</field><readable>true</readable></fieldPermissions>
     <fieldPermissions><editable>false</editable><field>Automatic_Intake__c.Sender_Email__c</field><readable>true</readable></fieldPermissions>
@@ -23,4 +23,5 @@
     <fieldPermissions><editable>false</editable><field>Automatic_Intake__c.Matched_Matter__c</field><readable>true</readable></fieldPermissions>
     <fieldPermissions><editable>false</editable><field>Automatic_Intake__c.Matched_Provider__c</field><readable>true</readable></fieldPermissions>
     <classAccesses><apexClass>AutomaticIntakeReviewController</apexClass><enabled>true</enabled></classAccesses>
+    <fieldPermissions><editable>false</editable><field>Automatic_Intake__c.Extraction_Confidence__c</field><readable>true</readable></fieldPermissions>
 </PermissionSet>
