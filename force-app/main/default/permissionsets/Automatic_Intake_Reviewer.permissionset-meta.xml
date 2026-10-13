@@ -16,7 +16,6 @@
     <fieldPermissions><editable>false</editable><field>Automatic_Intake__c.Subject__c</field><readable>true</readable></fieldPermissions>
     <fieldPermissions><editable>false</editable><field>Automatic_Intake__c.Received_At__c</field><readable>true</readable></fieldPermissions>
     <fieldPermissions><editable>false</editable><field>Automatic_Intake__c.Body_Text__c</field><readable>true</readable></fieldPermissions>
-    <fieldPermissions><editable>true</editable><field>Automatic_Intake__c.Status__c</field><readable>true</readable></fieldPermissions>
     <fieldPermissions><editable>false</editable><field>Automatic_Intake__c.Classification__c</field><readable>true</readable></fieldPermissions>
     <fieldPermissions><editable>false</editable><field>Automatic_Intake__c.Attachment_Count__c</field><readable>true</readable></fieldPermissions>
     <fieldPermissions><editable>true</editable><field>Automatic_Intake__c.Review_Reason__c</field><readable>true</readable></fieldPermissions>
