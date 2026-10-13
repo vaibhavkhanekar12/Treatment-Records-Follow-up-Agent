@@ -128,7 +128,6 @@ global without sharing class AutomaticIntakeEmailService implements Messaging.In
         }
         String material = String.valueOf(email.fromAddress) + '\n' +
             String.valueOf(email.subject) + '\n' +
-            String.valueOf(email.date) + '\n' +
             String.valueOf(email.plainTextBody);
         return EncodingUtil.convertToHex(
             Crypto.generateDigest('SHA-256', Blob.valueOf(material))
