@@ -3,7 +3,7 @@ import getOpenIntakes from '@salesforce/apex/AutomaticIntakeReviewController.get
 import { refreshApex } from '@salesforce/apex';
 
 const COLUMNS = [
-    { label: 'Intake', fieldName: 'Name', type: 'text' },
+    { label: 'Intake', fieldName: 'recordUrl', type: 'url', typeAttributes: { label: { fieldName: 'Name' }, target: '_self' } },
     { label: 'Received', fieldName: 'Received_At__c', type: 'date', typeAttributes: { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' } },
     { label: 'Sender', fieldName: 'Sender_Email__c', type: 'email' },
     { label: 'Subject', fieldName: 'Subject__c', type: 'text', wrapText: true },
@@ -23,7 +23,7 @@ export default class AutomaticIntakeReview extends LightningElement {
     wiredIntakes(result) {
         this.wiredResult = result;
         if (result.data) {
-            this.rows = result.data;
+            this.rows = result.data.map((row) => ({ ...row, recordUrl: `/lightning/r/Automatic_Intake__c/${row.Id}/view` }));
             this.error = undefined;
         } else if (result.error) {
             this.rows = undefined;
