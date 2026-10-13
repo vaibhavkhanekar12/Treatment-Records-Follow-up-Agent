@@ -31,6 +31,7 @@ global without sharing class AutomaticIntakeEmailService implements Messaging.In
             return result;
         }
 
+        Savepoint captureSavepoint = Database.setSavepoint();
         try {
             String bodyText = String.isNotBlank(email.plainTextBody)
                 ? email.plainTextBody
@@ -113,6 +114,7 @@ global without sharing class AutomaticIntakeEmailService implements Messaging.In
             result.success = true;
             return result;
         } catch (Exception ex) {
+            Database.rollback(captureSavepoint);
             // Do not expose email/attachment contents in the email-service response.
             result.message = 'Intake capture failed: ' + ex.getMessage();
             return result;
