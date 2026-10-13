@@ -87,14 +87,27 @@ public with sharing class AutomaticIntakeService {
         Id providerId = resolveProvider(payload);
         Id createdId;
         if (payload.documentType == 'Treatment') {
-            Treatment_Event__c eventRecord = new Treatment_Event__c(
-                Matter__c = payload.matterId,
-                Medical_Provider__c = providerId,
-                Treatment_Date__c = payload.treatmentDate,
-                Status__c = payload.treatmentStatus
-            );
-            insert eventRecord;
-            createdId = eventRecord.Id;
+            List<Treatment_Event__c> duplicateEvents = [
+                SELECT Id
+                FROM Treatment_Event__c
+                WHERE Matter__c = :payload.matterId
+                    AND Treatment_Date__c = :payload.treatmentDate
+                    AND Medical_Provider__c = :providerId
+                    AND Status__c = :payload.treatmentStatus
+                LIMIT 1
+            ];
+            if (!duplicateEvents.isEmpty()) {
+                createdId = duplicateEvents[0].Id;
+            } else {
+                Treatment_Event__c eventRecord = new Treatment_Event__c(
+                    Matter__c = payload.matterId,
+                    Medical_Provider__c = providerId,
+                    Treatment_Date__c = payload.treatmentDate,
+                    Status__c = payload.treatmentStatus
+                );
+                insert eventRecord;
+                createdId = eventRecord.Id;
+            }
         } else if (payload.documentType == 'Medical Records' ||
                    payload.documentType == 'Medical Bills' ||
                    payload.documentType == 'Records and Bills') {
@@ -103,16 +116,31 @@ public with sharing class AutomaticIntakeService {
                 requestType = payload.documentType == 'Medical Records' ? 'Records' :
                     payload.documentType == 'Medical Bills' ? 'Bills' : 'Records and Bills';
             }
-            Records_Request__c requestRecord = new Records_Request__c(
-                Matter__c = payload.matterId,
-                Medical_Provider__c = providerId,
-                Request_Type__c = requestType,
-                Status__c = 'Received',
-                Requested_Date__c = payload.requestedDate,
-                Received_Date__c = payload.receivedDate == null ? Date.today() : payload.receivedDate
-            );
-            insert requestRecord;
-            createdId = requestRecord.Id;
+            Date receivedOn = payload.receivedDate == null ? Date.today() : payload.receivedDate;
+            List<Records_Request__c> duplicateRequests = [
+                SELECT Id
+                FROM Records_Request__c
+                WHERE Matter__c = :payload.matterId
+                    AND Medical_Provider__c = :providerId
+                    AND Request_Type__c = :requestType
+                    AND Status__c = 'Received'
+                    AND Received_Date__c = :receivedOn
+                LIMIT 1
+            ];
+            if (!duplicateRequests.isEmpty()) {
+                createdId = duplicateRequests[0].Id;
+            } else {
+                Records_Request__c requestRecord = new Records_Request__c(
+                    Matter__c = payload.matterId,
+                    Medical_Provider__c = providerId,
+                    Request_Type__c = requestType,
+                    Status__c = 'Received',
+                    Requested_Date__c = payload.requestedDate,
+                    Received_Date__c = receivedOn
+                );
+                insert requestRecord;
+                createdId = requestRecord.Id;
+            }
         } else {
             // Provider-only documents update/create provider information, but must still have a Matter match.
             if (providerId == null) {
