@@ -56,7 +56,7 @@ Compare the actual schema with `prerequisites/` and `docs/org-discovery.md`. The
 The repository's staged script is designed to preserve the existing `Matter__c` object definition:
 
 ```powershell
-.\\scripts\\deploy-personal-injury.ps1 -TargetOrg pi-uat
+.\scripts\deploy-personal-injury.ps1 -TargetOrg pi-uat
 ```
 
 Read the script before execution and verify the stages against the target org. It may add solution-required Matter fields and the supporting Treatment Event, Records Request and Medical Provider model where expected. If those objects already exist with a different schema, do not blindly run the prerequisite stages; map the schema and use the appropriate skip/adapted deployment path.
