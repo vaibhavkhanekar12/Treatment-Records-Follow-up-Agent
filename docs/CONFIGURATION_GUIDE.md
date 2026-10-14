@@ -21,7 +21,7 @@ Confirm before deployment:
 - Salesforce CLI (`sf`) is installed and authenticated to the intended sandbox.
 - The org has the required Salesforce features/licenses for the components you plan to enable.
 - A technical admin can inspect object fields, picklist values, validation/duplicate rules, sharing, FLS, flows and scheduled jobs.
-- The org's actual `Matter__c`, `Treatment_Visits__c`, `Records_Request__c`, `Medical_Medical__c`, Contact and Task schema is documented in `docs/org-discovery.md`.
+- The org's actual `Matter__c`, `Treatment_Visits__c`, `Records_Request__c`, `Medical_Provider__c`, Contact and Task schema is documented in `docs/org-discovery.md`.
 - The business owner approves AI use for medical/legal case information, retention, sender/domain restrictions and communication templates before AI or inbound email is enabled.
 - Use a sandbox/UAT org first. Never test with real client communications without approval.
 
@@ -44,7 +44,7 @@ Before deployment, inspect the existing object and field API names, required fie
 - `Matter__c` (especially status, practice area, client, case manager and sign-up/demand dates)
 - `Treatment_Visits__c`
 - `Records_Request__c`
-- `Medical_Medical__c`
+- `Medical_Provider__c`
 - `Contact` and `Task`
 
 Compare the actual schema with `prerequisites/` and `docs/org-discovery.md`. The files under `prerequisites/` are a sample data model, not a mandate to replace the firm's objects. If the real schema differs, map/adapt the code and metadata before proceeding. Do not assume a successful metadata deployment proves the business fields are mapped correctly.
