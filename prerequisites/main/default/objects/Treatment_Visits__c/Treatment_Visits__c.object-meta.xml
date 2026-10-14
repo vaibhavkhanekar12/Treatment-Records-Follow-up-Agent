@@ -13,7 +13,6 @@
     <enableSearch>true</enableSearch>
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
-    <externalSharingModel>ControlledByParent</externalSharingModel>
     <label>Treatment Visit</label>
     <nameField>
         <displayFormat>TV-{000000}</displayFormat>
@@ -23,6 +22,5 @@
     </nameField>
     <pluralLabel>Treatment Visits</pluralLabel>
     <searchLayouts></searchLayouts>
-    <sharingModel>ControlledByParent</sharingModel>
     <visibility>Public</visibility>
 </CustomObject>
