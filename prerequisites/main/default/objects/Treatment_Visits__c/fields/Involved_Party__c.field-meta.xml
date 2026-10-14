@@ -3,9 +3,9 @@
     <fullName>Involved_Party__c</fullName>
     <label>Involved Party</label>
     <deleteConstraint>SetNull</deleteConstraint>
-    <referenceTo>Contact</referenceTo>
+    <referenceTo>Involved_Party__c</referenceTo>
     <relationshipLabel>Treatment Visits</relationshipLabel>
-    <relationshipName>Treatment_Visits</relationshipName>
+    <relationshipName>Involved_Party_Treatment_Visits</relationshipName>
     <required>false</required>
     <type>Lookup</type>
 </CustomField>
