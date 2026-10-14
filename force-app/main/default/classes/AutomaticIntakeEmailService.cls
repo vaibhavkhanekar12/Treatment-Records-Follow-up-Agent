@@ -1,9 +1,9 @@
 /**
  * Salesforce Email Service entry point for inbound client/provider email.
  *
- * Captures source content and attachments only. It deliberately does not infer clinical facts
- * or create Matter/Treatment/Provider/Records records from unverified email text.
- * Configure an Email Service address and restrict allowed senders/domains in the target org.
+ * Captures source content and attachments, then starts the simple automatic-intake processor.
+ * The processor only applies explicit, evidence-backed labels from the email and requires an
+ * unambiguous existing Matter before creating related business records.
  */
 global without sharing class AutomaticIntakeEmailService implements Messaging.InboundEmailHandler {
     global Messaging.InboundEmailResult handleInboundEmail(
@@ -26,7 +26,6 @@ global without sharing class AutomaticIntakeEmailService implements Messaging.In
             LIMIT 1
         ];
         if (!prior.isEmpty()) {
-            // Email services may receive the same message more than once. Do not duplicate files.
             result.success = true;
             return result;
         }
@@ -37,7 +36,6 @@ global without sharing class AutomaticIntakeEmailService implements Messaging.In
                 ? email.plainTextBody
                 : '';
             if (String.isBlank(bodyText) && String.isNotBlank(email.htmlBody)) {
-                // Preserve a bounded raw HTML body for review; no extraction is attempted here.
                 bodyText = email.htmlBody;
             }
             if (bodyText.length() > 32000) {
@@ -62,15 +60,13 @@ global without sharing class AutomaticIntakeEmailService implements Messaging.In
                 Status__c = 'Needs Review',
                 Classification__c = classify(clip(email.subject, 255), bodyText),
                 Attachment_Count__c = binaryFiles.size() + textFiles.size(),
-                Review_Reason__c = 'Source captured. Structured extraction and Matter/provider matching must be validated before business records can be created.'
+                Review_Reason__c = 'Source captured. Automatic matching and record creation is being evaluated.'
             );
             insert intake;
 
             List<ContentVersion> versions = new List<ContentVersion>();
             for (Messaging.InboundEmail.BinaryAttachment attachment : binaryFiles) {
-                if (attachment == null || attachment.body == null) {
-                    continue;
-                }
+                if (attachment == null || attachment.body == null) continue;
                 String fileName = safeFileName(attachment.fileName);
                 versions.add(new ContentVersion(
                     Title = clip(removeExtension(fileName), 255),
@@ -79,9 +75,7 @@ global without sharing class AutomaticIntakeEmailService implements Messaging.In
                 ));
             }
             for (Messaging.InboundEmail.TextAttachment attachment : textFiles) {
-                if (attachment == null || attachment.body == null) {
-                    continue;
-                }
+                if (attachment == null || attachment.body == null) continue;
                 String fileName = safeFileName(attachment.fileName);
                 versions.add(new ContentVersion(
                     Title = clip(removeExtension(fileName), 255),
@@ -102,12 +96,10 @@ global without sharing class AutomaticIntakeEmailService implements Messaging.In
                         ContentDocumentId = version.ContentDocumentId,
                         LinkedEntityId = intake.Id,
                         ShareType = 'V',
-                        Visibility = 'SharedUsers'
+                        Visibility = 'InternalUsers'
                     ));
                 }
-                if (!links.isEmpty()) {
-                    insert links;
-                }
+                if (!links.isEmpty()) insert links;
             }
 
             System.enqueueJob(new AutomaticIntakeProcessingQueueable(intake.Id));
@@ -115,7 +107,6 @@ global without sharing class AutomaticIntakeEmailService implements Messaging.In
             return result;
         } catch (Exception ex) {
             Database.rollback(captureSavepoint);
-            // Do not expose email/attachment contents in the email-service response.
             result.message = 'Intake capture failed: ' + ex.getMessage();
             return result;
         }
@@ -123,9 +114,7 @@ global without sharing class AutomaticIntakeEmailService implements Messaging.In
 
     @TestVisible
     private static String buildSourceKey(Messaging.InboundEmail email) {
-        if (String.isNotBlank(email.messageId)) {
-            return clip(email.messageId.trim(), 255);
-        }
+        if (String.isNotBlank(email.messageId)) return clip(email.messageId.trim(), 255);
         String material = String.valueOf(email.fromAddress) + '\n' +
             String.valueOf(email.subject) + '\n' +
             String.valueOf(email.plainTextBody);
@@ -147,29 +136,21 @@ global without sharing class AutomaticIntakeEmailService implements Messaging.In
         if (records) return 'Medical Records';
         if (bills) return 'Medical Bills';
         if (text.contains('appointment') || text.contains('treatment') ||
-            text.contains('visit summary') || text.contains('discharge summary')) {
-            return 'Treatment';
-        }
+            text.contains('visit summary') || text.contains('discharge summary')) return 'Treatment';
         if (text.contains('provider') || text.contains('clinic') ||
-            text.contains('hospital') || text.contains('fax number')) {
-            return 'Provider Information';
-        }
+            text.contains('hospital') || text.contains('fax number')) return 'Provider Information';
         return 'Other';
     }
 
     private static String safeEmail(String value) {
-        if (String.isBlank(value) || value.length() > 80 || !value.contains('@')) {
-            return null;
-        }
+        if (String.isBlank(value) || value.length() > 80 || !value.contains('@')) return null;
         return value;
     }
 
     private static String safeFileName(String value) {
         String candidate = String.isBlank(value) ? 'InboundAttachment.txt' : value;
         candidate = candidate.replaceAll('[\\\\/:*?"<>|]', '_');
-        if (candidate.length() > 180) {
-            candidate = candidate.substring(candidate.length() - 180);
-        }
+        if (candidate.length() > 180) candidate = candidate.substring(candidate.length() - 180);
         return candidate;
     }
 
