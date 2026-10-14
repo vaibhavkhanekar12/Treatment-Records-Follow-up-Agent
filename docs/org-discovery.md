@@ -24,13 +24,13 @@ The build environment had:
 - no Salesforce MCP/connector,
 - no credentials supplied in the request.
 
-So **nothing in this repository was retrieved from, validated against, or deployed to a Salesforce org.** Every object and field name below comes from the use-case specification (section 3.3 and its dependency on 3.2 "Treatment Events and Records Requests"). None of them come from the org.
+So **nothing in this repository was retrieved from, validated against, or deployed to a Salesforce org.** Every object and field name below comes from the use-case specification (section 3.3 and its dependency on 3.2 "Treatment Visits and Records Requests"). None of them come from the org.
 
 To stay honest about this, the solution is split into three package directories:
 
 | Directory | Purpose | Deploy to production? |
 |---|---|---|
-| `prerequisites/` | Minimal definitions of the objects this solution **reads** (Matter, Treatment Event, Records Request, Medical Provider). They exist only so a scratch/dev org can run the solution and its tests. | **No, if the org already has these objects.** Map them instead (section 4). |
+| `prerequisites/` | Minimal definitions of the objects this solution **reads** (Matter, Treatment Visit, Records Request, Medical Provider). They exist only so a scratch/dev org can run the solution and its tests. | **No, if the org already has these objects.** Map them instead (section 4). |
 | `force-app/` | The Follow-up solution itself: new object, fields, CMDT, Apex, LWC, Flows, permission sets, reports. | Yes, after the mapping is confirmed. |
 | `agentforce/` | Agentforce topics/actions, Prompt Builder templates, and the Einstein-backed draft generator/classifier. | Yes, but only in an org with Agentforce + Einstein generative AI enabled. |
 
@@ -51,12 +51,12 @@ The Apex code references only the objects and fields below. Treat this as the co
 
 **Added by this solution** (`force-app`): `Stalled__c` (Checkbox), `Stalled_Since__c` (Date).
 
-### Treatment Event (`Treatment_Event__c`): from 3.2
+### Treatment Visits (`Treatment_Visits__c`): existing org object
 | Field | Type | Used for |
 |---|---|---|
 | `Matter__c` | Master-Detail/Lookup(Matter) | Parent |
-| `Medical_Provider__c` | Lookup(Medical Provider) | Missing-bills check per provider |
-| `Treatment_Date__c` | Date | Last-treatment date |
+| `Provider__c` | Lookup(Medical Provider) | Missing-bills check per provider |
+| `Visit_Start__c` | DateTime | Last-treatment / next scheduled treatment date |
 | `Status__c` | Picklist | Excluded statuses (e.g. Cancelled/No Show) configurable |
 
 The solution **never reads** diagnosis, notes, CPT/ICD codes or any clinical field.
@@ -88,7 +88,7 @@ Run these once an org is authorised (`sf org login web -a pi-prod`) and record t
 ```bash
 # Data model
 sf sobject describe -s Matter__c            -o pi-prod > discovery/Matter__c.json
-sf sobject describe -s Treatment_Event__c   -o pi-prod > discovery/Treatment_Event__c.json
+sf sobject describe -s Treatment_Visits__c   -o pi-prod > discovery/Treatment_Visits__c.json
 sf sobject describe -s Records_Request__c   -o pi-prod > discovery/Records_Request__c.json
 sf sobject describe -s Medical_Provider__c  -o pi-prod > discovery/Medical_Provider__c.json
 sf data query -o pi-prod -q "SELECT Status__c, COUNT(Id) FROM Matter__c GROUP BY Status__c"
@@ -104,7 +104,7 @@ sf project retrieve start -o pi-prod -m GenAiPlannerBundle -m GenAiPlugin -m Gen
 
 # Security
 sf data query -o pi-prod -q "SELECT Name, Label FROM PermissionSet WHERE IsOwnedByProfile = false"
-sf data query -o pi-prod -q "SELECT SobjectType, InternalSharingModel FROM EntityDefinition WHERE QualifiedApiName IN ('Matter__c','Treatment_Event__c','Records_Request__c','Medical_Provider__c')" -t
+sf data query -o pi-prod -q "SELECT SobjectType, InternalSharingModel FROM EntityDefinition WHERE QualifiedApiName IN ('Matter__c','Treatment_Visits__c','Records_Request__c','Medical_Provider__c')" -t
 
 # Integrations
 sf data query -o pi-prod -t -q "SELECT DeveloperName, Endpoint FROM NamedCredential"
@@ -113,7 +113,7 @@ sf data query -o pi-prod -q "SELECT Address, DisplayName FROM OrgWideEmailAddres
 
 | Question | Expected by solution | Action if different |
 |---|---|---|
-| Do `Matter__c`, `Treatment_Event__c`, `Records_Request__c`, `Medical_Provider__c` exist? | Yes | If not, deploy `prerequisites/` (review first) |
+| Do `Matter__c`, `Treatment_Visits__c`, `Records_Request__c`, `Medical_Provider__c` exist? | Yes | If not, deploy `prerequisites/` (review first) |
 | Field API names match section 3? | Yes | Rename references in `FollowUpMatterSelector` (all object/field access is centralised there and in the draft/grounding builders) |
 | Matter open status values | `Open, Treating, Pre-Demand` (default) | Edit `Follow_Up_Setting.Default` CMDT record, no code change |
 | Outstanding request statuses | `Requested, Partially Received` | Edit CMDT, no code change |
