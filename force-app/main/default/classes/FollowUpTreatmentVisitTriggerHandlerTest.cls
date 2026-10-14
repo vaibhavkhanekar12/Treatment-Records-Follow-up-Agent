@@ -1,5 +1,7 @@
 @IsTest
 private class FollowUpTreatmentVisitTriggerHandlerTest {
+    private static final String VISIT_TYPE = 'Initial';
+
     @IsTest
     static void insertsQueueableForNewTreatmentVisit() {
         Treatment_Visits__c visitRecord = new Treatment_Visits__c(
@@ -8,11 +10,14 @@ private class FollowUpTreatmentVisitTriggerHandlerTest {
             Visit_Start__c = Datetime.now().addDays(-40),
             Visit_End__c = Datetime.now().addDays(-40).addHours(1),
             Visit_Attended__c = true,
-            Visit_Type__c = 'Initial Eval'
+            Visit_Type__c = VISIT_TYPE
         );
 
         Test.startTest();
-        FollowUpTreatmentVisitTriggerHandler.afterSave(new List<Treatment_Visits__c>{ visitRecord }, null);
+        FollowUpTreatmentVisitTriggerHandler.afterSave(
+            new List<Treatment_Visits__c>{ visitRecord },
+            null
+        );
         System.assertEquals(1, Limits.getQueueableJobs());
         Test.stopTest();
     }
@@ -28,7 +33,7 @@ private class FollowUpTreatmentVisitTriggerHandlerTest {
             Visit_Start__c = visitStart,
             Visit_End__c = visitStart.addHours(1),
             Visit_Attended__c = true,
-            Visit_Type__c = 'Initial Eval'
+            Visit_Type__c = VISIT_TYPE
         );
         Treatment_Visits__c newVisit = oldVisit.clone(true, false, false, false);
 
@@ -52,7 +57,7 @@ private class FollowUpTreatmentVisitTriggerHandlerTest {
             Visit_Start__c = visitStart,
             Visit_End__c = visitStart.addHours(1),
             Visit_Attended__c = true,
-            Visit_Type__c = 'Initial Eval'
+            Visit_Type__c = VISIT_TYPE
         );
         Treatment_Visits__c newVisit = oldVisit.clone(true, false, false, false);
         newVisit.Visit_Start__c = visitStart.addDays(1);
@@ -76,7 +81,10 @@ private class FollowUpTreatmentVisitTriggerHandlerTest {
 
         FollowUpTreatmentVisitTriggerHandler.bypass = true;
         Test.startTest();
-        FollowUpTreatmentVisitTriggerHandler.afterSave(new List<Treatment_Visits__c>{ visitRecord }, null);
+        FollowUpTreatmentVisitTriggerHandler.afterSave(
+            new List<Treatment_Visits__c>{ visitRecord },
+            null
+        );
         System.assertEquals(0, Limits.getQueueableJobs());
         Test.stopTest();
         FollowUpTreatmentVisitTriggerHandler.bypass = false;
