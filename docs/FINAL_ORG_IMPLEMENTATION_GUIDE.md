@@ -93,7 +93,7 @@ Eligibility is deterministic. AI is limited to drafting, rationale and inbound-r
 ### Data
 - `Follow_Up_Recommendation__c`
 - Matter status/stalled fields
-- Treatment Events
+- Treatment Visits
 - Records Requests
 - Medical Providers
 - Follow-up rules/settings Custom Metadata
@@ -267,7 +267,7 @@ Do not give broader permissions than required.
 ## 12. Deployment sequence
 
 1. Confirm the target org and Salesforce edition/features.
-2. Map the real Matter, Treatment Event, Records Request and Medical Provider data model.
+2. Map the real Matter, Treatment Visit, Records Request and Medical Provider data model.
 3. Deploy `force-app/main/default`.
 4. Deploy analytics/reporting metadata.
 5. Deploy optional Agentforce Apex support.
