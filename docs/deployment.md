@@ -47,7 +47,7 @@ The script performs these stages:
 5. Deploy Custom Metadata Type fields and records.
 6. Deploy `force-app` + `agentforce` + `analytics`.
 
-The `Treatment_Visits__c` object is now a deployable component in `prerequisites/`; it is not assumed to exist in the target org.
+The `Treatment_Visits__c` object is included in `prerequisites/` for deployment where the target org does not have it. Its Medical field uses the org's `Medical__c` Master-Detail relationship to `Medical_Provider__c`.
 
 ### Scratch / developer org (full stack)
 
@@ -78,13 +78,13 @@ The deployable object is:
 Fields included:
 
 - `Matter__c` — Lookup to `Matter__c`
-- `Provider__c` — Lookup to `Medical_Provider__c`
+- `Medical__c` — Master-Detail to `Medical_Provider__c`
 - `Visit_Start__c` — Date/Time
 - `Visit_End__c` — Date/Time
 - `Visit_Attended__c` — Checkbox
 - `Visit_Type__c` — Picklist
-- `Medical__c` — Checkbox
-- `Involved_Party__c` — Lookup to Contact
+- `Involved_Party__c` — Lookup to the `Involved_Party__c` object
+- 
 
 The follow-up engine reads Treatment Visits through `FollowUpMatterSelector`. Completed treatment is based on attended visits with a past `Visit_Start__c`; future visits are treated as upcoming appointments. The trigger re-evaluates the affected Matter when a Treatment Visit is inserted or relevant fields are updated.
 
@@ -110,7 +110,7 @@ Test at minimum:
 
 1. Create an attended past Treatment Visit → Matter gets evaluated using the visit.
 2. Create a future Treatment Visit → upcoming treatment is detected.
-3. Update Visit Start/Provider/Attendance → Matter is re-evaluated.
+3. Update Visit Start/Medical/Attendance → Matter is re-evaluated.
 4. Verify no duplicate active recommendations are created on repeated evaluation.
 5. Verify the automation user can read all Treatment Visit fields used by Apex.
 
