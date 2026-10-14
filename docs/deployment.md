@@ -4,7 +4,7 @@
 
 | Order | Directory | Contents | When |
 |---|---|---|---|
-| 0 | `prerequisites/` | Minimal Matter / Treatment Event / Records Request / Medical Provider objects | **Only when the target org does not already have these objects.** Never deploy these sample definitions over an established firm's data model. |
+| 0 | `prerequisites/` | Minimal Matter / Treatment Visit / Records Request / Medical Provider objects | **Only when the target org does not already have these objects.** Never deploy these sample definitions over an established firm's data model. |
 | 1 | `force-app/` | Core solution | Every org |
 | 2 | `analytics/` | Report types, reports, dashboard | After core |
 | 3 | `agentforce/` | Prompt grounding + Einstein adapters (Apex) | Only orgs with Einstein generative AI / Agentforce |
@@ -49,10 +49,10 @@ Or from Command Prompt:
 scripts\deploy-personal-injury.cmd Personal_Injury_Org
 ```
 
-The target Personal Injury org is expected to already have only `Matter__c`. The script performs four separate deployments and stops immediately if a stage fails:
+The target Personal Injury org is expected to already have `Matter__c` and the existing `Treatment_Visits__c` object. The script performs four separate deployments and stops immediately if a stage fails:
 
 1. Required fields on the existing `Matter__c`
-2. Creates `Medical_Provider__c`, `Records_Request__c`, and `Treatment_Event__c`
+2. Creates `Medical_Provider__c` and `Records_Request__c`; uses the existing `Treatment_Visits__c`
 3. `Follow_Up_Rule__mdt` + `Follow_Up_Setting__mdt` + `Response_Classification_Rule__mdt`
 4. `force-app` + `agentforce` + `analytics`
 
