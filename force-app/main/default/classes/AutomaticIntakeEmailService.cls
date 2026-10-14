@@ -3,6 +3,7 @@
  *
  * Captures the email/attachments and performs only safe, deterministic matching
  * when the email explicitly contains a Matter reference and Provider name.
+ * The Medical Provider record can be related to a Matter through Matter__c.
  * No clinical extraction, legal reasoning, or external communication is performed.
  */
 global without sharing class AutomaticIntakeEmailService implements Messaging.InboundEmailHandler {
@@ -58,7 +59,7 @@ global without sharing class AutomaticIntakeEmailService implements Messaging.In
             String providerName = extractValue(bodyText, 'provider:');
 
             Id matchedMatterId = findMatterId(matterReference);
-            Id matchedProviderId = findProviderId(providerName);
+            Id matchedProviderId = findProviderId(providerName, matchedMatterId);
 
             List<String> reviewNotes = new List<String>();
             reviewNotes.add('Email and attachments were captured for case-manager review.');
@@ -68,9 +69,13 @@ global without sharing class AutomaticIntakeEmailService implements Messaging.In
                 reviewNotes.add('Matter reference was provided but no unique Matter match was found.');
             }
             if (matchedProviderId != null) {
-                reviewNotes.add('Provider matched from the explicit Provider name in the email.');
+                reviewNotes.add(matchedMatterId != null
+                    ? 'Provider matched within the selected Matter using Medical Provider Matter__c.'
+                    : 'Provider matched from the explicit Provider name in the email.');
             } else if (String.isNotBlank(providerName)) {
-                reviewNotes.add('Provider name was provided but no unique Provider match was found.');
+                reviewNotes.add(matchedMatterId != null
+                    ? 'Provider name was provided but no unique Provider was found for the selected Matter.'
+                    : 'Provider name was provided but no unique Provider match was found.');
             }
 
             Automatic_Intake__c intake = new Automatic_Intake__c(
@@ -162,10 +167,22 @@ global without sharing class AutomaticIntakeEmailService implements Messaging.In
         return matches.size() == 1 ? matches[0].Id : null;
     }
 
-    private static Id findProviderId(String providerName) {
+    private static Id findProviderId(String providerName, Id matterId) {
         if (String.isBlank(providerName)) return null;
+
+        if (matterId != null) {
+            List<Medical_Provider__c> matterMatches = [
+                SELECT Id, Name, Matter__c
+                FROM Medical_Provider__c
+                WHERE Name = :providerName.trim()
+                AND Matter__c = :matterId
+                LIMIT 2
+            ];
+            return matterMatches.size() == 1 ? matterMatches[0].Id : null;
+        }
+
         List<Medical_Provider__c> matches = [
-            SELECT Id, Name
+            SELECT Id, Name, Matter__c
             FROM Medical_Provider__c
             WHERE Name = :providerName.trim()
             LIMIT 2
