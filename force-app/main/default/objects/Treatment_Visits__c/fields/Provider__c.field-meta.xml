@@ -5,7 +5,7 @@
     <deleteConstraint>SetNull</deleteConstraint>
     <referenceTo>Medical_Provider__c</referenceTo>
     <relationshipLabel>Treatment Visits</relationshipLabel>
-    <relationshipName>Treatment_Visits</relationshipName>
+    <relationshipName>Provider_Treatment_Visits</relationshipName>
     <required>false</required>
     <type>Lookup</type>
 </CustomField>
