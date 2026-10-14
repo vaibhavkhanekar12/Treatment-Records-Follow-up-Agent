@@ -5,6 +5,5 @@
     <referenceTo>Medical_Provider__c</referenceTo>
     <relationshipLabel>Treatment Visits</relationshipLabel>
     <relationshipName>Medical_Treatment_Visits</relationshipName>
-    <required>true</required>
     <type>MasterDetail</type>
 </CustomField>
