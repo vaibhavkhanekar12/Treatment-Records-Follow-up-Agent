@@ -22,7 +22,7 @@ public without sharing class FollowUpTreatmentVisitTriggerHandler {
                 oldRecord.Matter__c != visitRecord.Matter__c ||
                 oldRecord.Visit_Start__c != visitRecord.Visit_Start__c ||
                 oldRecord.Visit_End__c != visitRecord.Visit_End__c ||
-                oldRecord.Provider__c != visitRecord.Provider__c ||
+                oldRecord.Medical__c != visitRecord.Medical__c ||
                 oldRecord.Visit_Attended__c != visitRecord.Visit_Attended__c ||
                 oldRecord.Visit_Type__c != visitRecord.Visit_Type__c) {
                 matterIds.add(visitRecord.Matter__c);
