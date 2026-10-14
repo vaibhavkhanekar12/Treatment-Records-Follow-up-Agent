@@ -65,7 +65,7 @@ The solution **never reads** diagnosis, notes, CPT/ICD codes or any clinical fie
 | Field | Type | Used for |
 |---|---|---|
 | `Matter__c` | Master-Detail/Lookup(Matter) | Parent |
-| `Medical_Provider__c` | Lookup(Medical Provider) | Recipient of provider follow-ups |
+| `Provider__c` | Lookup(Medical Provider) | Recipient of provider follow-ups |
 | `Request_Type__c` | Picklist | Bills vs records (bill types configurable) |
 | `Status__c` | Picklist | Outstanding statuses configurable |
 | `Requested_Date__c` | Date | Request age |
