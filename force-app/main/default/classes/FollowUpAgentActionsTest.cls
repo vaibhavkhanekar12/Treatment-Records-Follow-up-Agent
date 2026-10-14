@@ -14,10 +14,11 @@ private class FollowUpAgentActionsTest {
         }
         Contact client = FollowUpTestDataFactory.client(caseManager.Id, 'jamie@client.example', '5550001');
         insert client;
-        Medical_Provider__c provider = FollowUpTestDataFactory.provider('Metro PT', 'records@metropt.example', null);
-        insert provider;
         Matter__c matter = FollowUpTestDataFactory.matter('M-5001', client.Id, caseManager.Id, TODAY.addDays(-100));
         insert matter;
+        Medical_Provider__c provider = FollowUpTestDataFactory.provider('Metro PT', 'records@metropt.example', null);
+        provider.Matter__c = matter.Id;
+        insert provider;
         insert new List<SObject>{
             FollowUpTestDataFactory.treatment(matter.Id, provider.Id, TODAY.addDays(-35), 'Completed'),
             FollowUpTestDataFactory.request(matter.Id, provider.Id, 'Records', 'Requested', TODAY.addDays(-20))
