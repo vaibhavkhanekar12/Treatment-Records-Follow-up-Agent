@@ -2,20 +2,19 @@
  * Bulk data access for the Treatment & Records Follow-up solution.
  * All matter-level facts are loaded in bulk (no SOQL in loops).
  *
- * Treatment history comes from the existing Treatment Visits object. Treatment_Event__c is not used.
- * Medical providers are also loaded through Medical_Provider__c.Matter__c so the agent can safely resolve
- * a provider when a matter has exactly one linked provider and a Treatment Visit does not contain one.
+ * Treatment history comes from the existing Treatment Visits object.
+ * Treatment_Event__c is not used.
  */
 @SuppressWarnings('PMD.ApexCRUDViolation')
 public with sharing class FollowUpMatterSelector {
     public static final String OUTBOUND_TASK_PREFIX = 'Follow-up sent:';
-    private static final String NO_MATCH = '__follow_up_no_match__';
 
     public static List<FollowUpMatterContext> loadContexts(Set<Id> matterIds, Date today) {
         Map<Id, FollowUpMatterContext> byMatter = new Map<Id, FollowUpMatterContext>();
         if (matterIds == null || matterIds.isEmpty()) {
             return byMatter.values();
         }
+
         for (Matter__c matter : [
             SELECT
                 Id,
@@ -37,6 +36,7 @@ public with sharing class FollowUpMatterSelector {
         ]) {
             byMatter.put(matter.Id, new FollowUpMatterContext(matter));
         }
+
         Set<Id> ids = byMatter.keySet();
         if (ids.isEmpty()) {
             return byMatter.values();
@@ -46,15 +46,21 @@ public with sharing class FollowUpMatterSelector {
 
         Set<Id> providerIds = new Set<Id>();
 
-        // Production source: existing Treatment Visits object.
-        // Treatment_Event__c is intentionally not used.
+        // Existing Treatment Visits object is the only source of treatment dates.
+        // A completed/attended visit is the treatment anchor; future visits are used only
+        // to determine whether an upcoming appointment exists.
         for (AggregateResult row : [
             SELECT Matter__c matterId, Provider__c providerId, MAX(Visit_Start__c) lastDateTime
             FROM Treatment_Visits__c
-            WHERE Matter__c IN :ids AND Visit_Start__c <= :System.now()
+            WHERE Matter__c IN :ids
+                AND Visit_Start__c <= :System.now()
+                AND Visit_Attended__c = TRUE
             GROUP BY Matter__c, Provider__c
         ]) {
             FollowUpMatterContext ctx = byMatter.get((Id) row.get('matterId'));
+            if (ctx == null) {
+                continue;
+            }
             Datetime lastDateTime = (Datetime) row.get('lastDateTime');
             Date lastDate = lastDateTime == null ? null : lastDateTime.date();
             Id providerId = (Id) row.get('providerId');
@@ -65,15 +71,19 @@ public with sharing class FollowUpMatterSelector {
             }
         }
 
+        // Future Treatment Visits are appointments, not completed treatment.
         for (AggregateResult row : [
             SELECT Matter__c matterId, MIN(Visit_Start__c) nextDateTime
             FROM Treatment_Visits__c
-            WHERE Matter__c IN :ids AND Visit_Start__c > :System.now()
+            WHERE Matter__c IN :ids
+                AND Visit_Start__c > :System.now()
             GROUP BY Matter__c
         ]) {
             Datetime nextDateTime = (Datetime) row.get('nextDateTime');
-            byMatter.get((Id) row.get('matterId')).nextScheduledTreatmentDate =
-                nextDateTime == null ? null : nextDateTime.date();
+            FollowUpMatterContext ctx = byMatter.get((Id) row.get('matterId'));
+            if (ctx != null) {
+                ctx.nextScheduledTreatmentDate = nextDateTime == null ? null : nextDateTime.date();
+            }
         }
 
         for (Records_Request__c req : [
@@ -88,8 +98,6 @@ public with sharing class FollowUpMatterSelector {
             }
         }
 
-        // Load providers referenced by requests/treatment visits and providers explicitly linked to the matter.
-        // The Matter__c lookup is used only as a safe fallback when there is exactly one linked provider.
         Map<Id, Medical_Provider__c> providers = new Map<Id, Medical_Provider__c>();
         for (Medical_Provider__c provider : [
             SELECT Id, Name, Email__c, Fax__c, Phone__c, Matter__c
@@ -114,8 +122,8 @@ public with sharing class FollowUpMatterSelector {
                 putProvider(ctx, providers.get(req.Medical_Provider__c));
             }
 
-            // Do not guess when a matter has multiple providers. If there is exactly one provider
-            // linked to the matter, use it only when the Treatment Visit omitted Provider__c.
+            // If a Treatment Visit has no Provider, use the matter provider only when
+            // there is exactly one provider linked to that matter. Never guess across multiple providers.
             if (ctx.lastTreatmentDate != null && ctx.lastTreatmentByProvider.isEmpty()) {
                 Medical_Provider__c onlyProvider = ctx.singleMatterProvider();
                 if (onlyProvider != null) {
@@ -198,6 +206,7 @@ public with sharing class FollowUpMatterSelector {
         if (byClient.isEmpty()) {
             return;
         }
+
         Set<Id> clientIds = byClient.keySet();
         String outboundPattern = OUTBOUND_TASK_PREFIX + '%';
         Map<Id, Date> latestContactByClient = new Map<Id, Date>();
@@ -225,11 +234,5 @@ public with sharing class FollowUpMatterSelector {
         if (provider != null) {
             ctx.providers.put(provider.Id, provider);
         }
-    }
-
-    private static Set<String> withSentinel(Set<String> values) {
-        Set<String> copy = new Set<String>(values);
-        copy.add(NO_MATCH);
-        return copy;
     }
 }
