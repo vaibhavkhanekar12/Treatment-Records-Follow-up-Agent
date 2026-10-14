@@ -33,7 +33,7 @@ The solution uses a `FollowUp*` Apex prefix and `Follow_Up_*` metadata prefix. T
 | Field | Type | Used for |
 |---|---|---|
 | `Matter__c` | Lookup(Matter) | Parent Matter |
-| `Provider__c` | Lookup(Medical Provider) | Treatment provider / missing-bills mapping |
+| `Medical__c` | Lookup(Medical Provider) | Treatment provider / missing-bills mapping |
 | `Visit_Start__c` | DateTime | Last completed / next scheduled treatment |
 | `Visit_End__c` | DateTime | Visit information |
 | `Visit_Attended__c` | Checkbox | Determines completed treatment |
@@ -47,13 +47,13 @@ The Apex engine reads treatment history from `Treatment_Visits__c`. It does not 
 | Field | Type | Used for |
 |---|---|---|
 | `Matter__c` | Lookup/Master-Detail(Matter) | Parent |
-| `Medical_Provider__c` | Lookup(Medical Provider) | Provider follow-ups |
+| `Medical_Medical__c` | Lookup(Medical Provider) | Provider follow-ups |
 | `Request_Type__c` | Picklist | Bills vs records |
 | `Status__c` | Picklist | Outstanding state |
 | `Requested_Date__c` | Date | Request age |
 | `Received_Date__c` | Date | Completion |
 
-### Medical Provider (`Medical_Provider__c`)
+### Medical Provider (`Medical_Medical__c`)
 `Name`, `Email__c`, `Fax__c`, `Phone__c`.
 
 ## 4. Pre-deployment discovery
@@ -64,7 +64,7 @@ Before deployment, check whether the target org already contains objects with th
 sf sobject describe -s Matter__c -o pi-prod
 sf sobject describe -s Treatment_Visits__c -o pi-prod
 sf sobject describe -s Records_Request__c -o pi-prod
-sf sobject describe -s Medical_Provider__c -o pi-prod
+sf sobject describe -s Medical_Medical__c -o pi-prod
 ```
 
 If `Treatment_Visits__c` does not exist, deploy the staged script. If it exists but has different field API names/types, do not deploy the sample definition over it; map the Apex implementation first.
