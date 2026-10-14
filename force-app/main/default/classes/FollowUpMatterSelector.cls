@@ -1,18 +1,13 @@
 /**
  * Bulk data access for the Treatment & Records Follow-up solution.
- * All matter-level facts are loaded with a fixed number of queries per call (no SOQL in loops),
- * so one batch scope costs 7 queries regardless of scope size.
+ * All matter-level facts are loaded in bulk (no SOQL in loops).
  *
- * Sharing: `with sharing`. The nightly batch runs as the automation user (Follow_Up_Automation permission
- * set: View All on the source objects); agent and UI callers see only what their own sharing allows, and
- * entry points verify matter access WITH USER_MODE before calling this selector.
+ * Treatment history comes from the existing Treatment Visits object. Treatment_Event__c is not used.
+ * Medical providers are also loaded through Medical_Provider__c.Matter__c so the agent can safely resolve
+ * a provider when a matter has exactly one linked provider and a Treatment Visit does not contain one.
  */
-// Reads run in the class sharing context without per-query CRUD/FLS: the nightly batch must compute complete facts for
-// every open matter, and user-facing callers verify access first (FollowUpSecurity.readableMatters / requireSourceDataAccess).
-// Outputs are aggregate facts written to Follow_Up_Recommendation__c, which inherits matter sharing.
 @SuppressWarnings('PMD.ApexCRUDViolation')
 public with sharing class FollowUpMatterSelector {
-    /** Prefix of Tasks this solution logs for its own outbound messages; excluded from client-contact recency. */
     public static final String OUTBOUND_TASK_PREFIX = 'Follow-up sent:';
     private static final String NO_MATCH = '__follow_up_no_match__';
 
@@ -52,7 +47,7 @@ public with sharing class FollowUpMatterSelector {
         Set<Id> providerIds = new Set<Id>();
 
         // Production source: existing Treatment Visits object.
-        // Treatment_Event__c is not used by the solution.
+        // Treatment_Event__c is intentionally not used.
         for (AggregateResult row : [
             SELECT Matter__c matterId, Provider__c providerId, MAX(Visit_Start__c) lastDateTime
             FROM Treatment_Visits__c
@@ -93,16 +88,39 @@ public with sharing class FollowUpMatterSelector {
             }
         }
 
-        if (!providerIds.isEmpty()) {
-            Map<Id, Medical_Provider__c> providers = new Map<Id, Medical_Provider__c>(
-                [SELECT Id, Name, Email__c, Fax__c, Phone__c FROM Medical_Provider__c WHERE Id IN :providerIds]
-            );
-            for (FollowUpMatterContext ctx : byMatter.values()) {
-                for (Id providerId : ctx.lastTreatmentByProvider.keySet()) {
-                    putProvider(ctx, providers.get(providerId));
+        // Load providers referenced by requests/treatment visits and providers explicitly linked to the matter.
+        // The Matter__c lookup is used only as a safe fallback when there is exactly one linked provider.
+        Map<Id, Medical_Provider__c> providers = new Map<Id, Medical_Provider__c>();
+        for (Medical_Provider__c provider : [
+            SELECT Id, Name, Email__c, Fax__c, Phone__c, Matter__c
+            FROM Medical_Provider__c
+            WHERE Id IN :providerIds OR Matter__c IN :ids
+        ]) {
+            providers.put(provider.Id, provider);
+            if (provider.Matter__c != null && byMatter.containsKey(provider.Matter__c)) {
+                FollowUpMatterContext ctx = byMatter.get(provider.Matter__c);
+                if (!ctx.providersByMatter.containsKey(provider.Matter__c)) {
+                    ctx.providersByMatter.put(provider.Matter__c, new List<Medical_Provider__c>());
                 }
-                for (Records_Request__c req : ctx.requests) {
-                    putProvider(ctx, providers.get(req.Medical_Provider__c));
+                ctx.providersByMatter.get(provider.Matter__c).add(provider);
+            }
+        }
+
+        for (FollowUpMatterContext ctx : byMatter.values()) {
+            for (Id providerId : ctx.lastTreatmentByProvider.keySet()) {
+                putProvider(ctx, providers.get(providerId));
+            }
+            for (Records_Request__c req : ctx.requests) {
+                putProvider(ctx, providers.get(req.Medical_Provider__c));
+            }
+
+            // Do not guess when a matter has multiple providers. If there is exactly one provider
+            // linked to the matter, use it only when the Treatment Visit omitted Provider__c.
+            if (ctx.lastTreatmentDate != null && ctx.lastTreatmentByProvider.isEmpty()) {
+                Medical_Provider__c onlyProvider = ctx.singleMatterProvider();
+                if (onlyProvider != null) {
+                    ctx.lastTreatmentByProvider.put(onlyProvider.Id, ctx.lastTreatmentDate);
+                    putProvider(ctx, onlyProvider);
                 }
             }
         }
