@@ -1,58 +1,106 @@
 @IsTest
 private class FollowUpTreatmentTriggerHandlerTest {
     @IsTest
-    static void insertsQueueableForNewTreatmentEvent() {
-        FollowUpTestDataFactory.useDefaultConfig();
-        Contact client = FollowUpTestDataFactory.client(null, 'treatment-trigger@example.com', '5550101');
-        insert client;
-        Medical_Provider__c provider = FollowUpTestDataFactory.provider('Trigger Test Provider', 'provider@example.com', null);
-        insert provider;
-        Matter__c matter = FollowUpTestDataFactory.matter('TRIGGER-TEST-1', client.Id, UserInfo.getUserId(), Date.today().addDays(-90));
-        insert matter;
+    static void insertsQueueableForNewTreatmentVisit() {
+        Treatment_Visits__c visitRecord = new Treatment_Visits__c(
+            Matter__c = UserInfo.getUserId(),
+            Provider__c = UserInfo.getUserId(),
+            Visit_Start__c = Datetime.now().addDays(-40),
+            Visit_End__c = Datetime.now().addDays(-40).addHours(1),
+            Visit_Attended__c = true,
+            Visit_Type__c = 'Initial Eval'
+        );
 
         Test.startTest();
-        Treatment_Event__c eventRecord = new Treatment_Event__c(
-            Matter__c = matter.Id,
-            Medical_Provider__c = provider.Id,
-            Treatment_Date__c = Date.today().addDays(-40),
-            Status__c = 'Completed'
+        FollowUpTreatmentVisitTriggerHandler.afterSave(
+            new List<Treatment_Visits__c>{ visitRecord },
+            null
         );
-        insert eventRecord;
-        Test.stopTest();
-
         System.assertEquals(
             1,
-            [SELECT COUNT() FROM Follow_Up_Recommendation__c WHERE Matter__c = :matter.Id],
-            'Treatment Event creation should trigger immediate asynchronous evaluation.'
+            Limits.getQueueableJobs(),
+            'A new Treatment Visit with a Matter should schedule asynchronous evaluation.'
         );
+        Test.stopTest();
     }
 
     @IsTest
-    static void updateQueuesOnlyWhenRelevantTreatmentDataChanges() {
-        FollowUpTestDataFactory.useDefaultConfig();
-        Contact client = FollowUpTestDataFactory.client(null, 'treatment-trigger-update@example.com', '5550102');
-        insert client;
-        Medical_Provider__c provider = FollowUpTestDataFactory.provider('Trigger Update Provider', 'provider2@example.com', null);
-        insert provider;
-        Matter__c matter = FollowUpTestDataFactory.matter('TRIGGER-TEST-2', client.Id, UserInfo.getUserId(), Date.today().addDays(-90));
-        insert matter;
+    static void doesNotQueueWhenRelevantFieldsDidNotChange() {
+        Id matterId = UserInfo.getUserId();
+        Id providerId = UserInfo.getUserId();
+        Datetime visitStart = Datetime.now().addDays(-40);
 
-        Treatment_Event__c eventRecord = new Treatment_Event__c(
-            Matter__c = matter.Id,
-            Medical_Provider__c = provider.Id,
-            Treatment_Date__c = Date.today().addDays(-40),
-            Status__c = 'Completed'
+        Treatment_Visits__c oldVisit = new Treatment_Visits__c(
+            Id = '001000000000001AAA',
+            Matter__c = matterId,
+            Provider__c = providerId,
+            Visit_Start__c = visitStart,
+            Visit_End__c = visitStart.addHours(1),
+            Visit_Attended__c = true,
+            Visit_Type__c = 'Initial Eval'
         );
-        insert eventRecord;
+        Treatment_Visits__c newVisit = oldVisit.clone(true, false, false, false);
 
         Test.startTest();
-        eventRecord.Treatment_Date__c = Date.today().addDays(-50);
-        update eventRecord;
-        Test.stopTest();
-
-        System.assert(
-            [SELECT COUNT() FROM Follow_Up_Recommendation__c WHERE Matter__c = :matter.Id] > 0,
-            'Relevant Treatment Event updates should re-evaluate the Matter.'
+        FollowUpTreatmentVisitTriggerHandler.afterSave(
+            new List<Treatment_Visits__c>{ newVisit },
+            new Map<Id, Treatment_Visits__c>{ oldVisit.Id => oldVisit }
         );
+        System.assertEquals(
+            0,
+            Limits.getQueueableJobs(),
+            'An update with no relevant Treatment Visit changes should not queue evaluation.'
+        );
+        Test.stopTest();
+    }
+
+    @IsTest
+    static void queuesWhenTreatmentDateChanges() {
+        Id matterId = UserInfo.getUserId();
+        Id providerId = UserInfo.getUserId();
+        Datetime visitStart = Datetime.now().addDays(-40);
+
+        Treatment_Visits__c oldVisit = new Treatment_Visits__c(
+            Id = '001000000000002AAA',
+            Matter__c = matterId,
+            Provider__c = providerId,
+            Visit_Start__c = visitStart,
+            Visit_End__c = visitStart.addHours(1),
+            Visit_Attended__c = true,
+            Visit_Type__c = 'Initial Eval'
+        );
+        Treatment_Visits__c newVisit = oldVisit.clone(true, false, false, false);
+        newVisit.Visit_Start__c = visitStart.addDays(1);
+
+        Test.startTest();
+        FollowUpTreatmentVisitTriggerHandler.afterSave(
+            new List<Treatment_Visits__c>{ newVisit },
+            new Map<Id, Treatment_Visits__c>{ oldVisit.Id => oldVisit }
+        );
+        System.assertEquals(
+            1,
+            Limits.getQueueableJobs(),
+            'Changing the Treatment Visit date should re-evaluate the Matter.'
+        );
+        Test.stopTest();
+    }
+
+    @IsTest
+    static void bypassPreventsQueueing() {
+        Treatment_Visits__c visitRecord = new Treatment_Visits__c(
+            Matter__c = UserInfo.getUserId(),
+            Provider__c = UserInfo.getUserId(),
+            Visit_Start__c = Datetime.now().addDays(-40)
+        );
+
+        FollowUpTreatmentVisitTriggerHandler.bypass = true;
+        Test.startTest();
+        FollowUpTreatmentVisitTriggerHandler.afterSave(
+            new List<Treatment_Visits__c>{ visitRecord },
+            null
+        );
+        System.assertEquals(0, Limits.getQueueableJobs());
+        Test.stopTest();
+        FollowUpTreatmentVisitTriggerHandler.bypass = false;
     }
 }
