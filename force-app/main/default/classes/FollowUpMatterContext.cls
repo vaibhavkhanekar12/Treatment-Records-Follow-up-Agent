@@ -5,19 +5,15 @@
  */
 public with sharing class FollowUpMatterContext {
     public Matter__c matter;
-    /** Client record loaded separately from Client__c to avoid depending on a target-org relationship alias. */
     public Contact clientRecord;
-    /** Most recent non-excluded treatment on or before the evaluation date. */
     public Date lastTreatmentDate;
-    /** Earliest non-excluded treatment scheduled after the evaluation date. */
     public Date nextScheduledTreatmentDate;
     public Map<Id, Date> lastTreatmentByProvider = new Map<Id, Date>();
     public Map<Id, Medical_Provider__c> providers = new Map<Id, Medical_Provider__c>();
-    /** All records requests on the matter (any status), oldest request first. */
+    /** Providers explicitly linked to the matter through Medical_Provider__c.Matter__c. */
+    public Map<Id, List<Medical_Provider__c>> providersByMatter = new Map<Id, List<Medical_Provider__c>>();
     public List<Records_Request__c> requests = new List<Records_Request__c>();
-    /** Most recent completed activity with the client, excluding this solution's own outbound log entries. */
     public Date lastClientContactDate;
-    /** Follow-up recommendations on the matter, newest first. */
     public List<Follow_Up_Recommendation__c> history = new List<Follow_Up_Recommendation__c>();
 
     public FollowUpMatterContext(Matter__c matter) {
@@ -28,7 +24,6 @@ public with sharing class FollowUpMatterContext {
         return clientRecord;
     }
 
-    /** Sign-up date, falling back to the matter creation date when sign-up is not recorded. */
     public Date signUpDate() {
         if (matter.Sign_Up_Date__c != null) {
             return matter.Sign_Up_Date__c;
@@ -36,12 +31,10 @@ public with sharing class FollowUpMatterContext {
         return matter.CreatedDate == null ? null : matter.CreatedDate.date();
     }
 
-    /** Date the current treatment gap is measured from: last treatment, else sign-up. */
     public Date treatmentAnchor() {
         return lastTreatmentDate != null ? lastTreatmentDate : signUpDate();
     }
 
-    /** Case manager, else matter owner when the owner is a user (queues cannot own Tasks). */
     public Id assigneeId() {
         if (matter.Case_Manager__c != null) {
             return matter.Case_Manager__c;
@@ -72,7 +65,6 @@ public with sharing class FollowUpMatterContext {
         return matches;
     }
 
-    /** Sent (or sent-then-completed) recommendations for a key, newest first. */
     public List<Follow_Up_Recommendation__c> sentForKey(String dedupeKey) {
         List<Follow_Up_Recommendation__c> sent = new List<Follow_Up_Recommendation__c>();
         for (Follow_Up_Recommendation__c rec : historyForKey(dedupeKey)) {
@@ -84,7 +76,6 @@ public with sharing class FollowUpMatterContext {
                 sent.add(rec);
             }
         }
-        // History is ordered by CreatedDate; callers need the most recently SENT first.
         List<SentOrder> ordered = new List<SentOrder>();
         for (Follow_Up_Recommendation__c rec : sent) {
             ordered.add(new SentOrder(rec));
@@ -97,7 +88,6 @@ public with sharing class FollowUpMatterContext {
         return sent;
     }
 
-    /** Client check-ins sent on or after the given date that have not received a response. */
     public Integer unansweredSince(String dedupeKey, Date since) {
         Integer count = 0;
         for (Follow_Up_Recommendation__c rec : sentForKey(dedupeKey)) {
@@ -128,7 +118,15 @@ public with sharing class FollowUpMatterContext {
         return outstanding;
     }
 
+    public Medical_Provider__c singleMatterProvider() {
+        List<Medical_Provider__c> matterProviders = providersByMatter.get(matter.Id);
+        return matterProviders != null && matterProviders.size() == 1 ? matterProviders[0] : null;
+    }
+
     public Boolean hasBillRequestFor(Id providerId, Set<String> billTypes) {
+        if (providerId == null) {
+            return false;
+        }
         for (Records_Request__c req : requests) {
             if (req.Medical_Provider__c == providerId && billTypes.contains(req.Request_Type__c)) {
                 return true;
@@ -137,7 +135,6 @@ public with sharing class FollowUpMatterContext {
         return false;
     }
 
-    /** Latest of: any request made, any records received, any provider follow-up sent. */
     public Date lastRecordsActivity() {
         Date latest = null;
         for (Records_Request__c req : requests) {
