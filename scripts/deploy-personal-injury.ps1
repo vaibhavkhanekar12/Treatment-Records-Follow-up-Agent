@@ -1,15 +1,11 @@
 # Treatment & Records Follow-up Agent deployment for the Personal Injury org.
 #
-# IMPORTANT: Do not deploy force-app directly for a target org that is missing the
-# prerequisite objects/CMDT types. Salesforce deployments are transactions, and
-# dependent package directories sometimes must be deployed sequentially.
+# The target org is expected to already contain Matter__c. This deployment creates
+# the solution-owned Treatment_Visits__c, Records_Request__c and Medical_Provider__c
+# objects before deploying the dependent Apex/Flow/permissions.
 #
 # Usage:
 #   .\scripts\deploy-personal-injury.ps1 -TargetOrg Personal_Injury_Org
-#
-# The target org is expected to already contain Matter__c and its existing Treatment_Visits__c.
-# This script adds only the required Matter fields plus the supporting Records_Request__c
-# and Medical_Provider__c objects; it does not create a duplicate Treatment_Event__c object.
 #
 # For a scratch/developer org missing the complete sample data model:
 #   .\scripts\deploy-personal-injury.ps1 -TargetOrg <alias> -DeployFullPrerequisites
@@ -48,7 +44,7 @@ function Invoke-SfDeploy {
 }
 
 if ($DeployFullPrerequisites) {
-    Write-Host 'Stage 1/4: deploying full sample prerequisite data model...' -ForegroundColor Cyan
+    Write-Host 'Stage 1/6: deploying full sample prerequisite data model...' -ForegroundColor Cyan
 
     Invoke-SfDeploy `
         -Arguments @(
@@ -60,10 +56,10 @@ if ($DeployFullPrerequisites) {
         -FailureMessage 'Full prerequisite deployment failed. Main package deployment was not started.'
 }
 elseif (-not $SkipPrerequisites) {
-    Write-Host 'Stage 1/4: deploying required Matter fields...' -ForegroundColor Cyan
+    Write-Host 'Stage 1/6: deploying required Matter fields...' -ForegroundColor Cyan
 
-    # Matter__c already exists in the target org. Deploy only the fields required
-    # by this solution; never deploy the sample Matter__c object definition.
+    # Matter__c already exists in the target org. Deploy only fields required by
+    # this solution; never deploy the sample Matter__c object definition.
     $matterFields = @(
         'prerequisites/main/default/objects/Matter__c/fields/Case_Manager__c.field-meta.xml',
         'prerequisites/main/default/objects/Matter__c/fields/Client__c.field-meta.xml',
@@ -83,34 +79,36 @@ elseif (-not $SkipPrerequisites) {
         -Arguments $fieldArgs `
         -FailureMessage 'Required Matter field deployment failed. Main package deployment was not started.'
 
-    Write-Host 'Stage 2/6: creating supporting custom objects...' -ForegroundColor Cyan
+    Write-Host 'Stage 2/6: creating solution custom objects...' -ForegroundColor Cyan
 
-    # Create only solution-owned supporting objects. Treatment Visits is an
-    # existing client/org object and is intentionally not created here.
+    # Object definitions are deployed first because Treatment_Visits__c.Provider__c
+    # references Medical_Provider__c.
     Invoke-SfDeploy `
         -Arguments @(
             'project', 'deploy', 'start',
             '--source-dir', 'prerequisites/main/default/objects/Medical_Provider__c/Medical_Provider__c.object-meta.xml',
             '--source-dir', 'prerequisites/main/default/objects/Records_Request__c/Records_Request__c.object-meta.xml',
+            '--source-dir', 'prerequisites/main/default/objects/Treatment_Visits__c/Treatment_Visits__c.object-meta.xml',
             '--target-org', $TargetOrg,
             '--wait', $Wait
         ) `
-        -FailureMessage 'Supporting custom object definition deployment failed. Main package deployment was not started.'
+        -FailureMessage 'Custom object definition deployment failed. Dependent solution deployment was not started.'
 
-    Write-Host 'Stage 3/6: deploying supporting custom object fields...' -ForegroundColor Cyan
+    Write-Host 'Stage 3/6: deploying custom object fields...' -ForegroundColor Cyan
 
     Invoke-SfDeploy `
         -Arguments @(
             'project', 'deploy', 'start',
             '--source-dir', 'prerequisites/main/default/objects/Medical_Provider__c/fields',
             '--source-dir', 'prerequisites/main/default/objects/Records_Request__c/fields',
+            '--source-dir', 'prerequisites/main/default/objects/Treatment_Visits__c/fields',
             '--target-org', $TargetOrg,
             '--wait', $Wait
         ) `
-        -FailureMessage 'Supporting custom object field deployment failed. Main package deployment was not started.'
+        -FailureMessage 'Custom object field deployment failed. Dependent solution deployment was not started.'
 }
 else {
-    Write-Host 'Stage 1/4: skipping prerequisites (-SkipPrerequisites).' -ForegroundColor Yellow
+    Write-Host 'Stages 1-3/6: skipping prerequisites (-SkipPrerequisites).' -ForegroundColor Yellow
 }
 
 Write-Host 'Stage 4/6: creating Follow-up Custom Metadata Types...' -ForegroundColor Cyan
@@ -126,7 +124,7 @@ Invoke-SfDeploy `
     ) `
     -FailureMessage 'Custom Metadata Type definition deployment failed. Main package deployment was not started.'
 
-Write-Host 'Stage 5/6: deploying Custom Metadata Type fields...' -ForegroundColor Cyan
+Write-Host 'Stage 5/6: deploying Custom Metadata Type fields and records...' -ForegroundColor Cyan
 
 Invoke-SfDeploy `
     -Arguments @(
@@ -134,21 +132,11 @@ Invoke-SfDeploy `
         '--source-dir', 'force-app/main/default/objects/Follow_Up_Rule__mdt/fields',
         '--source-dir', 'force-app/main/default/objects/Follow_Up_Setting__mdt/fields',
         '--source-dir', 'force-app/main/default/objects/Response_Classification_Rule__mdt/fields',
-        '--target-org', $TargetOrg,
-        '--wait', $Wait
-    ) `
-    -FailureMessage 'Custom Metadata Type field deployment failed. Main package deployment was not started.'
-
-Write-Host 'Stage 5/6: deploying Custom Metadata Type records...' -ForegroundColor Cyan
-
-Invoke-SfDeploy `
-    -Arguments @(
-        'project', 'deploy', 'start',
         '--source-dir', 'force-app/main/default/customMetadata',
         '--target-org', $TargetOrg,
         '--wait', $Wait
     ) `
-    -FailureMessage 'Custom Metadata record deployment failed. Main package deployment was not started.'
+    -FailureMessage 'Custom Metadata field/record deployment failed. Main package deployment was not started.'
 
 Write-Host 'Stage 6/6: deploying dependent solution, Agentforce Apex, and analytics...' -ForegroundColor Cyan
 
