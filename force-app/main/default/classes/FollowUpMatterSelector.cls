@@ -32,14 +32,15 @@ public with sharing class FollowUpMatterSelector {
         Set<Id> providerIds = new Set<Id>();
 
         // EXISTING PRODUCTION SOURCE: Treatment Visits.
+        // Medical__c is the Treatment Visit's Master-Detail relationship to Medical Provider.
         // Only attended visits in the past count as completed treatment.
         for (AggregateResult row : [
-            SELECT Matter__c matterId, Provider__c providerId, MAX(Visit_Start__c) lastDateTime
+            SELECT Matter__c matterId, Medical__c providerId, MAX(Visit_Start__c) lastDateTime
             FROM Treatment_Visits__c
             WHERE Matter__c IN :ids
               AND Visit_Start__c <= :System.now()
               AND Visit_Attended__c = TRUE
-            GROUP BY Matter__c, Provider__c
+            GROUP BY Matter__c, Medical__c
         ]) {
             FollowUpMatterContext ctx = byMatter.get((Id) row.get('matterId'));
             if (ctx == null) continue;
