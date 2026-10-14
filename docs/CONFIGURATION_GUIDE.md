@@ -21,7 +21,7 @@ Confirm before deployment:
 - Salesforce CLI (`sf`) is installed and authenticated to the intended sandbox.
 - The org has the required Salesforce features/licenses for the components you plan to enable.
 - A technical admin can inspect object fields, picklist values, validation/duplicate rules, sharing, FLS, flows and scheduled jobs.
-- The org's actual `Matter__c`, `Treatment_Event__c`, `Records_Request__c`, `Medical_Provider__c`, Contact and Task schema is documented in `docs/org-discovery.md`.
+- The org's actual `Matter__c`, `Treatment_Visits__c`, `Records_Request__c`, `Medical_Medical__c`, Contact and Task schema is documented in `docs/org-discovery.md`.
 - The business owner approves AI use for medical/legal case information, retention, sender/domain restrictions and communication templates before AI or inbound email is enabled.
 - Use a sandbox/UAT org first. Never test with real client communications without approval.
 
@@ -42,9 +42,9 @@ Use the alias you authenticated to in all commands. Do not put access tokens, pa
 Before deployment, inspect the existing object and field API names, required fields, picklist values, lookups, validation rules and automation for:
 
 - `Matter__c` (especially status, practice area, client, case manager and sign-up/demand dates)
-- `Treatment_Event__c`
+- `Treatment_Visits__c`
 - `Records_Request__c`
-- `Medical_Provider__c`
+- `Medical_Medical__c`
 - `Contact` and `Task`
 
 Compare the actual schema with `prerequisites/` and `docs/org-discovery.md`. The files under `prerequisites/` are a sample data model, not a mandate to replace the firm's objects. If the real schema differs, map/adapt the code and metadata before proceeding. Do not assume a successful metadata deployment proves the business fields are mapped correctly.
@@ -59,7 +59,7 @@ The repository's staged script is designed to preserve the existing `Matter__c` 
 .\scripts\deploy-personal-injury.ps1 -TargetOrg pi-uat
 ```
 
-Read the script before execution and verify the stages against the target org. It may add solution-required Matter fields and the supporting Treatment Event, Records Request and Medical Provider model where expected. If those objects already exist with a different schema, do not blindly run the prerequisite stages; map the schema and use the appropriate skip/adapted deployment path.
+Read the script before execution and verify the stages against the target org. It may add solution-required Matter fields and the supporting Treatment Visit, Records Request and Medical Provider model where expected. If those objects already exist with a different schema, do not blindly run the prerequisite stages; map the schema and use the appropriate skip/adapted deployment path.
 
 - Use `-SkipPrerequisites` only when the required objects and fields are already present and compatible.
 - Use `-DeployFullPrerequisites` only for a disposable scratch/developer org that genuinely needs the sample data model. **Never use this flag against the established PI org.**
