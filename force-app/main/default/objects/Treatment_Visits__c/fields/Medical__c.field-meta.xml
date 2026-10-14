@@ -2,6 +2,10 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Medical__c</fullName>
     <label>Medical</label>
-    <defaultValue>true</defaultValue>
-    <type>Checkbox</type>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <referenceTo>Medical__c</referenceTo>
+    <relationshipLabel>Treatment Visits</relationshipLabel>
+    <relationshipName>Medical_Treatment_Visits</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
 </CustomField>
