@@ -78,15 +78,14 @@ The deployable object is:
 Fields included:
 
 - `Matter__c` — Lookup to `Matter__c`
-- `Medical__c` — Master-Detail to `Medical_Provider__c`
+- `Medical__c` — Master-Detail to `Medical_Provider__c` (use this exact API name; do not add a duplicate `Provider__c`)
 - `Visit_Start__c` — Date/Time
 - `Visit_End__c` — Date/Time
 - `Visit_Attended__c` — Checkbox
 - `Visit_Type__c` — Picklist
-- `Involved_Party__c` — Lookup to the `Involved_Party__c` object
-- 
+- `Involved_Party__c` — Lookup to `Involved_Party__c`
 
-The follow-up engine reads Treatment Visits through `FollowUpMatterSelector`. Completed treatment is based on attended visits with a past `Visit_Start__c`; future visits are treated as upcoming appointments. The trigger re-evaluates the affected Matter when a Treatment Visit is inserted or relevant fields are updated.
+The follow-up engine reads treatment history from `Treatment_Visits__c` using `Medical__c` for the Medical Provider master-detail relationship. Completed treatment is based on attended visits with a past `Visit_Start__c`; future visits are treated as upcoming appointments. The trigger re-evaluates the affected Matter when a Treatment Visit is inserted or relevant fields are updated.
 
 ## 5. Post-deployment configuration
 
