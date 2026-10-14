@@ -1,9 +1,9 @@
 /**
- * Optional inbound-email capture for case-manager review.
+ * Inbound-email capture for case-manager review.
  *
- * The core Treatment & Records Follow-up Agent uses existing Matter, Treatment Event,
- * and Records Request records. This handler only stages incoming email and attachments;
- * it does not extract clinical facts, auto-match records, or send external communications.
+ * Captures the email/attachments and performs only safe, deterministic matching
+ * when the email explicitly contains a Matter reference and Provider name.
+ * No clinical extraction, legal reasoning, or external communication is performed.
  */
 global without sharing class AutomaticIntakeEmailService implements Messaging.InboundEmailHandler {
     global Messaging.InboundEmailResult handleInboundEmail(
@@ -51,6 +51,28 @@ global without sharing class AutomaticIntakeEmailService implements Messaging.In
                     ? new List<Messaging.InboundEmail.TextAttachment>()
                     : email.textAttachments;
 
+            String matterReference = extractValue(bodyText, 'matter reference:');
+            if (String.isBlank(matterReference)) {
+                matterReference = extractValue(bodyText, 'matter:');
+            }
+            String providerName = extractValue(bodyText, 'provider:');
+
+            Id matchedMatterId = findMatterId(matterReference);
+            Id matchedProviderId = findProviderId(providerName);
+
+            List<String> reviewNotes = new List<String>();
+            reviewNotes.add('Email and attachments were captured for case-manager review.');
+            if (matchedMatterId != null) {
+                reviewNotes.add('Matter matched from the explicit Matter reference in the email.');
+            } else if (String.isNotBlank(matterReference)) {
+                reviewNotes.add('Matter reference was provided but no unique Matter match was found.');
+            }
+            if (matchedProviderId != null) {
+                reviewNotes.add('Provider matched from the explicit Provider name in the email.');
+            } else if (String.isNotBlank(providerName)) {
+                reviewNotes.add('Provider name was provided but no unique Provider match was found.');
+            }
+
             Automatic_Intake__c intake = new Automatic_Intake__c(
                 Email_Message_Id__c = sourceKey,
                 Sender_Email__c = safeEmail(email.fromAddress),
@@ -60,7 +82,9 @@ global without sharing class AutomaticIntakeEmailService implements Messaging.In
                 Status__c = 'Needs Review',
                 Classification__c = classify(clip(email.subject, 255), bodyText),
                 Attachment_Count__c = binaryFiles.size() + textFiles.size(),
-                Review_Reason__c = 'Email and attachments were captured for case-manager review. This optional intake feature does not automatically link Matter/Provider records or create Treatment Events/Records Requests.'
+                Matched_Matter__c = matchedMatterId,
+                Matched_Provider__c = matchedProviderId,
+                Review_Reason__c = String.join(reviewNotes, ' ')
             );
             insert intake;
 
@@ -109,6 +133,44 @@ global without sharing class AutomaticIntakeEmailService implements Messaging.In
             result.message = 'Intake capture failed: ' + ex.getMessage();
             return result;
         }
+    }
+
+    @TestVisible
+    private static String extractValue(String body, String label) {
+        if (String.isBlank(body) || String.isBlank(label)) return null;
+        String normalizedLabel = label.toLowerCase();
+        for (String line : body.split('\\n')) {
+            if (line == null) continue;
+            String trimmed = line.trim();
+            String lower = trimmed.toLowerCase();
+            if (lower.startsWith(normalizedLabel)) {
+                String value = trimmed.substring(label.length()).trim();
+                return String.isBlank(value) ? null : clip(value, 255);
+            }
+        }
+        return null;
+    }
+
+    private static Id findMatterId(String matterReference) {
+        if (String.isBlank(matterReference)) return null;
+        List<Matter__c> matches = [
+            SELECT Id, Name
+            FROM Matter__c
+            WHERE Name = :matterReference.trim()
+            LIMIT 2
+        ];
+        return matches.size() == 1 ? matches[0].Id : null;
+    }
+
+    private static Id findProviderId(String providerName) {
+        if (String.isBlank(providerName)) return null;
+        List<Medical_Provider__c> matches = [
+            SELECT Id, Name
+            FROM Medical_Provider__c
+            WHERE Name = :providerName.trim()
+            LIMIT 2
+        ];
+        return matches.size() == 1 ? matches[0].Id : null;
     }
 
     @TestVisible
