@@ -223,7 +223,7 @@ public class FollowUpTestDataFactory {
     public static Treatment_Visits__c treatment(Id matterId, Id providerId, Date treatmentDate, String status) {
         return new Treatment_Visits__c(
             Matter__c = matterId,
-            Provider__c = providerId,
+            Medical__c = providerId,
             Visit_Start__c = Datetime.newInstance(treatmentDate, Time.newInstance(12, 0, 0, 0))
         );
     }
@@ -278,80 +278,15 @@ public class FollowUpTestDataFactory {
             Audience__c = audience,
             Channel__c = channel,
             Recipient_Contact__c = contactId,
-            Medical_Provider__c = providerId,
-            Draft_Subject__c = 'Checking in',
-            Draft_Message__c = 'Hello, this is a neutral administrative check-in.',
-            Draft_Source__c = FollowUpConstants.DRAFT_TEMPLATE,
-            Reason__c = 'Test reason',
-            Assigned_To__c = UserInfo.getUserId()
+            Recipient_Provider__c = providerId,
+            Draft_Message__c = 'Draft message'
         );
     }
 
-    public static Id fakeId(Schema.SObjectType sObjectType) {
+    public static Id fakeId(Schema.SObjectType objectType) {
         fakeIdCounter++;
-        String counter = String.valueOf(fakeIdCounter);
-        return Id.valueOf(
-            sObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() + '0'.repeat(12 - counter.length()) + counter
-        );
-    }
-
-    public static FollowUpMatterContext context(Date signUpDate, Contact client) {
-        Matter__c matter = new Matter__c(
-            Id = fakeId(Matter__c.SObjectType),
-            Name = 'M-TEST',
-            Status__c = 'Treating',
-            Sign_Up_Date__c = signUpDate,
-            Case_Manager__c = UserInfo.getUserId()
-        );
-        if (client != null) {
-            if (client.Id == null) {
-                client.Id = fakeId(Contact.SObjectType);
-            }
-            matter.Client__c = client.Id;
-            matter.putSObject('Client__r', client);
-        }
-        return new FollowUpMatterContext(matter);
-    }
-
-    public static Records_Request__c memoryRequest(
-        FollowUpMatterContext ctx,
-        Medical_Provider__c provider,
-        String requestType,
-        String status,
-        Date requestedDate
-    ) {
-        if (provider.Id == null) {
-            provider.Id = fakeId(Medical_Provider__c.SObjectType);
-        }
-        ctx.providers.put(provider.Id, provider);
-        Records_Request__c req = new Records_Request__c(
-            Id = fakeId(Records_Request__c.SObjectType),
-            Matter__c = ctx.matter.Id,
-            Medical_Provider__c = provider.Id,
-            Request_Type__c = requestType,
-            Status__c = status,
-            Requested_Date__c = requestedDate
-        );
-        ctx.requests.add(req);
-        return req;
-    }
-
-    public static Follow_Up_Recommendation__c memoryHistory(
-        FollowUpMatterContext ctx,
-        String recType,
-        String dedupeKey,
-        String status,
-        Datetime sentDate
-    ) {
-        Follow_Up_Recommendation__c rec = new Follow_Up_Recommendation__c(
-            Id = fakeId(Follow_Up_Recommendation__c.SObjectType),
-            Matter__c = ctx.matter.Id,
-            Recommendation_Type__c = recType,
-            Status__c = status,
-            Dedupe_Key__c = dedupeKey,
-            Sent_Date__c = sentDate
-        );
-        ctx.history.add(rec);
-        return rec;
+        String prefix = objectType.getDescribe().getKeyPrefix();
+        String suffix = String.valueOf(fakeIdCounter).leftPad(12, '0');
+        return (Id) (prefix + suffix);
     }
 }
