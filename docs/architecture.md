@@ -4,7 +4,7 @@
 
 ```
                          SALESFORCE (system of record)
-Matter__c ─┬─ Treatment_Event__c   (3.2)            Contact (client)   Task (activity log)
+Matter__c ─┬─ Treatment_Visits__c   (existing org object)            Contact (client)   Task (activity log)
            ├─ Records_Request__c   (3.2) ── Medical_Provider__c
            └─ Follow_Up_Recommendation__c  (NEW, Master-Detail → inherits matter sharing)
                               │
@@ -57,7 +57,7 @@ Matter__c ─┬─ Treatment_Event__c   (3.2)            Contact (client)   Tas
 **Decision.** Create one new object. Nothing equivalent exists in the specification or the repository.
 **Why Master-Detail.** Recommendations contain treatment facts. Inheriting the matter's sharing ("Controlled by Parent") guarantees nobody sees a recommendation for a matter they cannot see. No extra sharing rules are needed.
 **Why not Task alone.** Tasks cannot hold approval state, dedupe keys, rationale, classification and structured metrics for reporting, and approval enforcement on Task would affect all activities firm-wide.
-**Not created.** No fields on `Records_Request__c` or `Treatment_Event__c`. Follow-up counts are derived from recommendation history. The only additions to `Matter__c` are `Stalled__c` and `Stalled_Since__c`, for supervisor dashboards.
+**Not created.** No fields on `Records_Request__c` or `Treatment_Visits__c`. Follow-up counts are derived from recommendation history. The only additions to `Matter__c` are `Stalled__c` and `Stalled_Since__c`, for supervisor dashboards.
 
 ### ADR-4: Custom Metadata for every business threshold
 `Follow_Up_Rule__mdt` (one record per rule: thresholds, cadence, escalation count, priority, channel, auto-task), `Follow_Up_Setting__mdt` (open statuses, practice area, outstanding request statuses, bill types, excluded treatment statuses, restricted AI terms, pluggable class names, firm name, org-wide email), `Response_Classification_Rule__mdt` (keywords → category → next action). CMDT is deployable, versioned and packageable, and needs no code change to tune. Apex holds only rule *identities*, never numbers.
