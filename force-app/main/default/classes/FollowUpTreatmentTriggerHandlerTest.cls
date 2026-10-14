@@ -16,22 +16,19 @@ private class FollowUpTreatmentTriggerHandlerTest {
             new List<Treatment_Visits__c>{ visitRecord },
             null
         );
-        System.assertEquals(
-            1,
-            Limits.getQueueableJobs(),
-            'A new Treatment Visit with a Matter should schedule asynchronous evaluation.'
-        );
+        System.assertEquals(1, Limits.getQueueableJobs());
         Test.stopTest();
     }
 
     @IsTest
     static void doesNotQueueWhenRelevantFieldsDidNotChange() {
+        Id recordId = UserInfo.getUserId();
         Id matterId = UserInfo.getUserId();
         Id providerId = UserInfo.getUserId();
         Datetime visitStart = Datetime.now().addDays(-40);
 
         Treatment_Visits__c oldVisit = new Treatment_Visits__c(
-            Id = '001000000000001AAA',
+            Id = recordId,
             Matter__c = matterId,
             Provider__c = providerId,
             Visit_Start__c = visitStart,
@@ -46,22 +43,19 @@ private class FollowUpTreatmentTriggerHandlerTest {
             new List<Treatment_Visits__c>{ newVisit },
             new Map<Id, Treatment_Visits__c>{ oldVisit.Id => oldVisit }
         );
-        System.assertEquals(
-            0,
-            Limits.getQueueableJobs(),
-            'An update with no relevant Treatment Visit changes should not queue evaluation.'
-        );
+        System.assertEquals(0, Limits.getQueueableJobs());
         Test.stopTest();
     }
 
     @IsTest
     static void queuesWhenTreatmentDateChanges() {
+        Id recordId = UserInfo.getUserId();
         Id matterId = UserInfo.getUserId();
         Id providerId = UserInfo.getUserId();
         Datetime visitStart = Datetime.now().addDays(-40);
 
         Treatment_Visits__c oldVisit = new Treatment_Visits__c(
-            Id = '001000000000002AAA',
+            Id = recordId,
             Matter__c = matterId,
             Provider__c = providerId,
             Visit_Start__c = visitStart,
@@ -77,11 +71,7 @@ private class FollowUpTreatmentTriggerHandlerTest {
             new List<Treatment_Visits__c>{ newVisit },
             new Map<Id, Treatment_Visits__c>{ oldVisit.Id => oldVisit }
         );
-        System.assertEquals(
-            1,
-            Limits.getQueueableJobs(),
-            'Changing the Treatment Visit date should re-evaluate the Matter.'
-        );
+        System.assertEquals(1, Limits.getQueueableJobs());
         Test.stopTest();
     }
 
