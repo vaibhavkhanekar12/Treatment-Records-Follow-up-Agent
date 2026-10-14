@@ -3,7 +3,7 @@
  * All matter-level facts are loaded in bulk (no SOQL in loops).
  *
  * Treatment history comes from the existing Treatment Visits object.
- * Treatment_Event__c is not used.
+ * Treatment history is sourced from Treatment_Visits__c only.
  */
 @SuppressWarnings('PMD.ApexCRUDViolation')
 public with sharing class FollowUpMatterSelector {
