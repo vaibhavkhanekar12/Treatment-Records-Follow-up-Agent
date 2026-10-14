@@ -81,8 +81,8 @@ elseif (-not $SkipPrerequisites) {
 
     Write-Host 'Stage 2/6: creating solution custom objects...' -ForegroundColor Cyan
 
-    # Object definitions are deployed first because Treatment_Visits__c.Provider__c
-    # references Medical_Provider__c.
+    # Object definitions are deployed before Treatment_Visits__c because its Medical__c
+    # Master-Detail field references Medical_Provider__c.
     Invoke-SfDeploy `
         -Arguments @(
             'project', 'deploy', 'start',
