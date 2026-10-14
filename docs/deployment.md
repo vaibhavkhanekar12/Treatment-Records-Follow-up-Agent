@@ -4,7 +4,7 @@
 
 | Order | Directory | Contents | When |
 |---|---|---|---|
-| 0 | `prerequisites/` | Minimal Matter / Treatment Visit / Records Request / Medical Provider objects | **Only when the target org does not already have these objects.** Never deploy these sample definitions over an established firm's data model. |
+| 0 | `prerequisites/` | Sample data model for disposable scratch/dev orgs | **Only for disposable scratch/dev orgs that need it.** Never deploy sample object definitions over the established org's existing Matter / Treatment Visits data model. |
 | 1 | `force-app/` | Core solution | Every org |
 | 2 | `analytics/` | Report types, reports, dashboard | After core |
 | 3 | `agentforce/` | Prompt grounding + Einstein adapters (Apex) | Only orgs with Einstein generative AI / Agentforce |
@@ -99,7 +99,7 @@ sf project deploy start --source-dir agentforce --target-org pi-uat --test-level
 - Stop the job: *Setup → Scheduled Jobs → "Treatment & Records Follow-up - Nightly Evaluation" → Delete*.
 - Turn off individual rules: `Active__c = false`.
 - Turn off AI: clear the two class-name fields in `Follow_Up_Setting.Default`.
-- The solution adds no triggers and changes no existing records other than `Matter__c.Stalled__c`/`Stalled_Since__c` and its own recommendations and Tasks.
+- The solution adds a Treatment Visits trigger and changes no existing records other than `Matter__c.Stalled__c`/`Stalled_Since__c` and its own recommendations and Tasks.
 
 ## 7. CI/CD
 
@@ -121,7 +121,7 @@ The implementation is intentionally mapped to the Treatment & Records Follow-up 
 - Treatment gaps: Follow_Up_Rule.Treatment_Gap compares the latest treatment/sign-up anchor with today and creates an approval-controlled client check-in.
 - Records follow-up: Follow_Up_Rule.Records_Follow_Up tracks request age and repeat cadence.
 - Second provider miss escalation: Follow_Up_Rule.Provider_Escalation escalates after two sent provider follow-ups and automatically creates an internal case-manager Task.
-- Missing bills: the rule engine checks treatment events against bill-request activity.
+- Missing bills: the rule engine checks Treatment Visits against bill-request activity.
 - Client contact recency: completed client Tasks are included in matter facts and the stalled condition.
 - Stalled/at-risk matters: treatment, records activity and client-contact staleness are combined into a rule-based stalled-risk signal and persisted to Matter__c.Stalled__c / Stalled_Since__c.
 - Monthly client status: Client_Status_Update creates a plain-language client update recommendation on a configurable cadence.
