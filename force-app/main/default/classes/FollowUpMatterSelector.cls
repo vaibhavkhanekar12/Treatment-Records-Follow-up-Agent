@@ -49,32 +49,36 @@ public with sharing class FollowUpMatterSelector {
 
         loadClients(byMatter.values());
 
-        Set<String> excluded = withSentinel(FollowUpConfig.excludedTreatmentStatuses());
         Set<Id> providerIds = new Set<Id>();
 
+        // Production source: existing Treatment Visits object.
+        // Treatment_Event__c is not used by the solution.
         for (AggregateResult row : [
-            SELECT Matter__c matterId, Medical_Provider__c providerId, MAX(Treatment_Date__c) lastDate
-            FROM Treatment_Event__c
-            WHERE Matter__c IN :ids AND Treatment_Date__c <= :today AND Status__c NOT IN :excluded
-            GROUP BY Matter__c, Medical_Provider__c
+            SELECT Matter__c matterId, Provider__c providerId, MAX(Visit_Start__c) lastDateTime
+            FROM Treatment_Visits__c
+            WHERE Matter__c IN :ids AND Visit_Start__c <= :System.now()
+            GROUP BY Matter__c, Provider__c
         ]) {
             FollowUpMatterContext ctx = byMatter.get((Id) row.get('matterId'));
-            Date lastDate = (Date) row.get('lastDate');
+            Datetime lastDateTime = (Datetime) row.get('lastDateTime');
+            Date lastDate = lastDateTime == null ? null : lastDateTime.date();
             Id providerId = (Id) row.get('providerId');
             ctx.lastTreatmentDate = FollowUpMatterContext.maxDate(ctx.lastTreatmentDate, lastDate);
-            if (providerId != null) {
+            if (providerId != null && lastDate != null) {
                 ctx.lastTreatmentByProvider.put(providerId, lastDate);
                 providerIds.add(providerId);
             }
         }
 
         for (AggregateResult row : [
-            SELECT Matter__c matterId, MIN(Treatment_Date__c) nextDate
-            FROM Treatment_Event__c
-            WHERE Matter__c IN :ids AND Treatment_Date__c > :today AND Status__c NOT IN :excluded
+            SELECT Matter__c matterId, MIN(Visit_Start__c) nextDateTime
+            FROM Treatment_Visits__c
+            WHERE Matter__c IN :ids AND Visit_Start__c > :System.now()
             GROUP BY Matter__c
         ]) {
-            byMatter.get((Id) row.get('matterId')).nextScheduledTreatmentDate = (Date) row.get('nextDate');
+            Datetime nextDateTime = (Datetime) row.get('nextDateTime');
+            byMatter.get((Id) row.get('matterId')).nextScheduledTreatmentDate =
+                nextDateTime == null ? null : nextDateTime.date();
         }
 
         for (Records_Request__c req : [
@@ -205,7 +209,6 @@ public with sharing class FollowUpMatterSelector {
         }
     }
 
-    /** SOQL `NOT IN` with an empty bind set is avoided by adding a value that can never match. */
     private static Set<String> withSentinel(Set<String> values) {
         Set<String> copy = new Set<String>(values);
         copy.add(NO_MATCH);
