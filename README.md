@@ -72,17 +72,17 @@ AI is used for drafting, rationale and inbound classification only. Eligibility 
 
 ## Deployment
 
-If the target Personal Injury org is missing `Medical_Provider__c` and `Records_Request__c` (the dependencies shown in the current deployment errors), deploy those dependencies **first**, then deploy the solution. Do not deploy the full sample prerequisite data model into an established org that already has its own Matter / Treatment Event / Records Request / Medical Provider objects.
+The production solution uses the **existing Treatment Visits (`Treatment_Visits__c`) object** as the treatment source. It does not require or deploy a duplicate `Treatment_Event__c` object.
+
+If the target Personal Injury org is missing `Medical_Provider__c` and `Records_Request__c`, deploy those dependencies first, then deploy the solution. Do not deploy the full sample prerequisite data model into an established org that already has its own Matter / Treatment Visits / Records Request / Medical Provider objects.
 
 For the Personal Injury org on Windows, use the ordered deployment script:
 
 ```powershell
-.\\scripts\\deploy-personal-injury.ps1 -TargetOrg Personal_Injury_Org
+.\scripts\deploy-personal-injury.ps1 -TargetOrg Personal_Injury_Org
 ```
 
-The script performs three ordered deployments—missing Medical Provider / Records Request dependencies, solution-owned Custom Metadata Types, then the dependent solution—and stops immediately if any stage fails. For a scratch/developer org missing the entire sample data model, add `-DeployFullPrerequisites`. This prevents cascading `Medical_Provider__c`, `Records_Request__c`, `Response_Classification_Rule__mdt`, and dependent Apex compiler errors.
-
-If the target org already has those objects, skip `prerequisites/` and follow `docs/deployment.md` to map the existing data model before deploying the solution.
+For an org that already has Matter, Treatment Visits, Medical Provider and Records Request, use `-SkipPrerequisites` and deploy only the solution components.
 
 Complete Agentforce Builder/Prompt Builder configuration manually in the target org.
 
@@ -98,4 +98,4 @@ The second scheduler is optional. It runs as the dedicated automation user and s
 
 - The repository cannot configure a firm's external SMS/fax/telephony provider without the target org's Named/External Credential and provider contract.
 - Agentforce topics, actions and Prompt Builder templates are manual configuration that should be retrieved from the validated org after setup.
-- The existing solution should be mapped to the real Matter__c, Treatment_Event__c, Records_Request__c and Medical_Provider__c data contract before deployment.
+- The treatment source is the existing `Treatment_Visits__c` object; confirm its Matter, Provider and Visit Start field API names in the target org before deployment.

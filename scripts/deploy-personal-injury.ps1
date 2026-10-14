@@ -7,9 +7,9 @@
 # Usage:
 #   .\scripts\deploy-personal-injury.ps1 -TargetOrg Personal_Injury_Org
 #
-# The target org is expected to already contain Matter__c. This script adds only the
-# required Matter fields plus the supporting Treatment_Event__c, Records_Request__c,
-# and Medical_Provider__c objects; it never deploys the sample Matter__c object definition.
+# The target org is expected to already contain Matter__c and its existing Treatment_Visits__c.
+# This script adds only the required Matter fields plus the supporting Records_Request__c
+# and Medical_Provider__c objects; it does not create a duplicate Treatment_Event__c object.
 #
 # For a scratch/developer org missing the complete sample data model:
 #   .\scripts\deploy-personal-injury.ps1 -TargetOrg <alias> -DeployFullPrerequisites
@@ -85,15 +85,13 @@ elseif (-not $SkipPrerequisites) {
 
     Write-Host 'Stage 2/6: creating supporting custom objects...' -ForegroundColor Cyan
 
-    # Create the object definitions first. Fields are deployed in a separate
-    # transaction so lookup/reference fields never depend on an object that is
-    # only being created in the same deployment.
+    # Create only solution-owned supporting objects. Treatment Visits is an
+    # existing client/org object and is intentionally not created here.
     Invoke-SfDeploy `
         -Arguments @(
             'project', 'deploy', 'start',
             '--source-dir', 'prerequisites/main/default/objects/Medical_Provider__c/Medical_Provider__c.object-meta.xml',
             '--source-dir', 'prerequisites/main/default/objects/Records_Request__c/Records_Request__c.object-meta.xml',
-            '--source-dir', 'prerequisites/main/default/objects/Treatment_Event__c/Treatment_Event__c.object-meta.xml',
             '--target-org', $TargetOrg,
             '--wait', $Wait
         ) `
@@ -106,7 +104,6 @@ elseif (-not $SkipPrerequisites) {
             'project', 'deploy', 'start',
             '--source-dir', 'prerequisites/main/default/objects/Medical_Provider__c/fields',
             '--source-dir', 'prerequisites/main/default/objects/Records_Request__c/fields',
-            '--source-dir', 'prerequisites/main/default/objects/Treatment_Event__c/fields',
             '--target-org', $TargetOrg,
             '--wait', $Wait
         ) `
@@ -118,8 +115,6 @@ else {
 
 Write-Host 'Stage 4/6: creating Follow-up Custom Metadata Types...' -ForegroundColor Cyan
 
-# Deploy CMDT object definitions first. Salesforce must have the
-# Custom Metadata Type entity before its CustomField components can resolve it.
 Invoke-SfDeploy `
     -Arguments @(
         'project', 'deploy', 'start',
