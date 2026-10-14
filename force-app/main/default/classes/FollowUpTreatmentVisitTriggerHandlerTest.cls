@@ -4,7 +4,7 @@ private class FollowUpTreatmentVisitTriggerHandlerTest {
     static void insertsQueueableForNewTreatmentVisit() {
         Treatment_Visits__c visitRecord = new Treatment_Visits__c(
             Matter__c = UserInfo.getUserId(),
-            Provider__c = UserInfo.getUserId(),
+            Medical__c = UserInfo.getUserId(),
             Visit_Start__c = Datetime.now().addDays(-40),
             Visit_End__c = Datetime.now().addDays(-40).addHours(1),
             Visit_Attended__c = true,
@@ -24,7 +24,7 @@ private class FollowUpTreatmentVisitTriggerHandlerTest {
         Treatment_Visits__c oldVisit = new Treatment_Visits__c(
             Id = recordId,
             Matter__c = UserInfo.getUserId(),
-            Provider__c = UserInfo.getUserId(),
+            Medical__c = UserInfo.getUserId(),
             Visit_Start__c = visitStart,
             Visit_End__c = visitStart.addHours(1),
             Visit_Attended__c = true,
@@ -48,7 +48,7 @@ private class FollowUpTreatmentVisitTriggerHandlerTest {
         Treatment_Visits__c oldVisit = new Treatment_Visits__c(
             Id = recordId,
             Matter__c = UserInfo.getUserId(),
-            Provider__c = UserInfo.getUserId(),
+            Medical__c = UserInfo.getUserId(),
             Visit_Start__c = visitStart,
             Visit_End__c = visitStart.addHours(1),
             Visit_Attended__c = true,
@@ -70,7 +70,7 @@ private class FollowUpTreatmentVisitTriggerHandlerTest {
     static void bypassPreventsQueueing() {
         Treatment_Visits__c visitRecord = new Treatment_Visits__c(
             Matter__c = UserInfo.getUserId(),
-            Provider__c = UserInfo.getUserId(),
+            Medical__c = UserInfo.getUserId(),
             Visit_Start__c = Datetime.now().addDays(-40)
         );
 
