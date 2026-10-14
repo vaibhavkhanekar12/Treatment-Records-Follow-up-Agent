@@ -1,9 +1,9 @@
 /**
- * Salesforce Email Service entry point for inbound client/provider email.
+ * Optional inbound-email capture for case-manager review.
  *
- * Captures source content and attachments, then starts the simple automatic-intake processor.
- * The processor only applies explicit, evidence-backed labels from the email and requires an
- * unambiguous existing Matter before creating related business records.
+ * The core Treatment & Records Follow-up Agent uses existing Matter, Treatment Event,
+ * and Records Request records. This handler only stages incoming email and attachments;
+ * it does not extract clinical facts, auto-match records, or send external communications.
  */
 global without sharing class AutomaticIntakeEmailService implements Messaging.InboundEmailHandler {
     global Messaging.InboundEmailResult handleInboundEmail(
@@ -60,7 +60,7 @@ global without sharing class AutomaticIntakeEmailService implements Messaging.In
                 Status__c = 'Needs Review',
                 Classification__c = classify(clip(email.subject, 255), bodyText),
                 Attachment_Count__c = binaryFiles.size() + textFiles.size(),
-                Review_Reason__c = 'Source captured. Automatic matching and record creation is being evaluated.'
+                Review_Reason__c = 'Email and attachments were captured for case-manager review. This optional intake feature does not automatically link Matter/Provider records or create Treatment Events/Records Requests.'
             );
             insert intake;
 
@@ -102,7 +102,6 @@ global without sharing class AutomaticIntakeEmailService implements Messaging.In
                 if (!links.isEmpty()) insert links;
             }
 
-            System.enqueueJob(new AutomaticIntakeProcessingQueueable(intake.Id));
             result.success = true;
             return result;
         } catch (Exception ex) {
