@@ -33,13 +33,13 @@ The solution uses a `FollowUp*` Apex prefix and `Follow_Up_*` metadata prefix. T
 | Field | Type | Used for |
 |---|---|---|
 | `Matter__c` | Lookup(Matter) | Parent Matter |
-| `Medical__c` | Lookup(Medical Provider) | Treatment provider / missing-bills mapping |
+| `Medical__c` | Master-Detail(Medical Provider) | Treatment provider / missing-bills mapping |
 | `Visit_Start__c` | DateTime | Last completed / next scheduled treatment |
 | `Visit_End__c` | DateTime | Visit information |
 | `Visit_Attended__c` | Checkbox | Determines completed treatment |
 | `Visit_Type__c` | Picklist | Treatment visit classification |
-| `Medical__c` | Checkbox | Identifies medical treatment visit |
-| `Involved_Party__c` | Lookup(Contact) | Person involved in visit |
+
+| `Involved_Party__c` | Lookup(Involved_Party__c) | Person involved in visit |
 
 The Apex engine reads treatment history from `Treatment_Visits__c`. It does not use `Treatment_Event__c`.
 
