@@ -28,6 +28,14 @@
         <apexClass>FollowUpNightlyScheduler</apexClass>
         <enabled>true</enabled>
     </classAccesses>
+    <classAccesses>
+        <apexClass>FollowUpTreatmentVisitEvalQueueable</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>FollowUpTreatmentVisitTriggerHandler</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
     <description>Assign ONLY to the integration/automation user that schedules the nightly Treatment &amp; Records Follow-up evaluation. Grants View All on the source objects so every open matter is evaluated, and full access to Follow-up Recommendations.</description>
     <fieldPermissions>
         <editable>true</editable>
@@ -251,17 +259,42 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Treatment_Event__c.Medical_Provider__c</field>
+        <field>Treatment_Visits__c.Matter__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Treatment_Event__c.Treatment_Date__c</field>
+        <field>Treatment_Visits__c.Provider__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Treatment_Event__c.Status__c</field>
+        <field>Treatment_Visits__c.Visit_Start__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Treatment_Visits__c.Visit_End__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Treatment_Visits__c.Visit_Attended__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Treatment_Visits__c.Visit_Type__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Treatment_Visits__c.Medical__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Treatment_Visits__c.Involved_Party__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -358,7 +391,7 @@
         <allowEdit>false</allowEdit>
         <allowRead>true</allowRead>
         <modifyAllRecords>false</modifyAllRecords>
-        <object>Treatment_Event__c</object>
+        <object>Treatment_Visits__c</object>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
     <objectPermissions>

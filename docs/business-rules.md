@@ -14,7 +14,6 @@ A rule is evaluated only when `Active__c = true` **and** `Threshold_Days__c` is 
 | `Practice_Area_Filter__c` | `Personal Injury` | Blank = all practice areas |
 | `Outstanding_Request_Statuses__c` | `Requested,Partially Received` | Records requests still awaited |
 | `Bill_Request_Types__c` | `Bills,Records and Bills` | Request types that cover bills |
-| `Excluded_Treatment_Statuses__c` | `Cancelled,No Show` | Treatment events that do not count as treatment |
 
 If the `Default` record is missing, no matter is evaluated. The engine does not guess which matters are open.
 
@@ -22,8 +21,9 @@ If the `Default` record is missing, no matter is evaluated. The engine does not 
 
 | Fact | Definition |
 |---|---|
-| Last treatment | Max `Treatment_Date__c` ≤ today, excluding excluded statuses |
-| Next scheduled treatment | Min `Treatment_Date__c` > today, excluding excluded statuses |
+| Last treatment | Max `Treatment_Visits__c.Visit_Start__c` ≤ now where `Visit_Attended__c = true` |
+| Next scheduled treatment | Min `Treatment_Visits__c.Visit_Start__c` > now |
+| Treatment provider | `Treatment_Visits__c.Provider__c`; if missing, use the single provider linked to the Matter |
 | Treatment anchor | Last treatment, else `Sign_Up_Date__c`, else matter created date |
 | Gap days | Anchor → today |
 | Follow-ups sent for a request | Recommendations with key `Provider_Follow_Up\|<request>` in status Sent/Completed with a sent date |
@@ -38,7 +38,7 @@ If the `Default` record is missing, no matter is evaluated. The engine does not 
 | ↳ escalation | unanswered check-ins since the anchor ≥ `Escalate_After_Count`, **or** no client linked | **Treatment Gap Review** (internal, High) | after 2 |
 | **Records_Follow_Up** | outstanding request age ≥ `Threshold_Days` (first follow-up); then every `Repeat_After_Days` after the last sent follow-up | **Provider Records Follow-up** (provider-facing, approval required). Channel: Email → Fax → Phone. | 14 · repeat 10 · high ≥ 45 |
 | **Provider_Escalation** | sent follow-ups ≥ `Escalate_After_Count` **and** last follow-up ≥ `Threshold_Days` ago **and** still outstanding | **Provider Escalation** (internal, High). **Task auto-assigned** to the case manager. Further provider follow-ups for that request stop. | 2 follow-ups · 7 days · repeat 14 |
-| **Missing_Bills** | treatment at a provider older than `Threshold_Days` **and** no bills-type request for that provider | **Missing Bills** (internal) | 30 · repeat 30 |
+| **Missing_Bills** | attended treatment at a provider older than `Threshold_Days` **and** no bills-type request for that provider | **Missing Bills** (internal) | 30 · repeat 30 |
 | **Stalled_Matter** | gap ≥ `Threshold_Days` **and** records activity ≥ `Records_Activity_Days` **and** client contact ≥ `Client_Contact_Days` | Sets `Matter__c.Stalled__c` / `Stalled_Since__c`; **Stalled Matter Review** (internal, High, **Task auto-assigned**). The flag clears automatically when any signal resumes. | 45 / 30 / 30 · repeat 14 |
 | **Client_Status_Update** | client has email or mobile **and** sign-up ≥ `Threshold_Days` ago | **Client Status Update** (template draft, **bulk-approvable**, Low) | 30 · repeat 30 |
 
@@ -52,7 +52,7 @@ Every follow-up subject has a stable **Dedupe Key**: `<Type>|<matter or request>
 2. **Sent, completed or rejected** within `Repeat_After_Days` → suppressed.
 3. **Snoozed or re-check date** (`Next_Follow_Up_Date__c` in the future) → suppressed until that date.
 4. **Superseded** items never suppress.
-5. **Condition no longer holds** (e.g. treatment resumed) → open rule-generated items are set to **Superseded** automatically, so stale messages are never sent.
+5. **Condition no longer holds** (for example, a new attended Treatment Visit removes the gap) → open rule-generated items are set to **Superseded** automatically, so stale messages are never sent.
 
 Running the evaluation twice in a row creates nothing new (covered by tests).
 
@@ -60,7 +60,7 @@ Running the evaluation twice in a row creates nothing new (covered by tests).
 
 | Situation | Behaviour |
 |---|---|
-| No treatment, no sign-up date, no created date | Skipped with a run warning; nothing is inferred |
+| No attended treatment, no sign-up date, no created date | Skipped with a run warning; nothing is inferred |
 | No client linked | Internal Treatment Gap Review ("no client contact linked") |
 | Client has no email/mobile | Check-in as a phone call script; monthly update skipped with a warning |
 | Email opt-out on the client | Email channel is not used; delivery is refused |
