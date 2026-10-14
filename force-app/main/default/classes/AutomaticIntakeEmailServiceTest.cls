@@ -1,7 +1,7 @@
 @IsTest
 private class AutomaticIntakeEmailServiceTest {
     @IsTest
-    static void capturesEmailAndAttachmentOnce() {
+    static void capturesEmailAndAttachmentOnceForReview() {
         Messaging.InboundEmail email = new Messaging.InboundEmail();
         email.fromAddress = 'provider@example.com';
         email.subject = 'Medical records and billing statement';
@@ -25,15 +25,17 @@ private class AutomaticIntakeEmailServiceTest {
         System.assertEquals(true, first.success, first.message);
         System.assertEquals(true, second.success, second.message);
         List<Automatic_Intake__c> rows = [
-            SELECT Id, Status__c, Classification__c, Attachment_Count__c, Sender_Email__c
+            SELECT Id, Status__c, Classification__c, Attachment_Count__c,
+                   Sender_Email__c, Review_Reason__c
             FROM Automatic_Intake__c
             WHERE Email_Message_Id__c = '<intake-test-001@example.com>'
         ];
-        System.assertEquals(1, rows.size(), 'Duplicate message delivery must not create another intake.');
+        System.assertEquals(1, rows.size(), 'Duplicate delivery must not create another intake.');
         System.assertEquals('Needs Review', rows[0].Status__c);
         System.assertEquals('Records and Bills', rows[0].Classification__c);
         System.assertEquals(1, rows[0].Attachment_Count__c);
         System.assertEquals('provider@example.com', rows[0].Sender_Email__c);
+        System.assert(rows[0].Review_Reason__c.contains('case-manager review'));
         System.assertEquals(1, [
             SELECT COUNT()
             FROM ContentDocumentLink
