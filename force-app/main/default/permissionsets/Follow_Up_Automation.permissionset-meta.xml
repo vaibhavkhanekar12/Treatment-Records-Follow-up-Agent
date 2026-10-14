@@ -11,8 +11,6 @@
     <classAccesses><apexClass>FollowUpTreatmentVisitEvalQueueable</apexClass><enabled>true</enabled></classAccesses>
     <classAccesses><apexClass>FollowUpTreatmentVisitTriggerHandler</apexClass><enabled>true</enabled></classAccesses>
     <description>Assign ONLY to the integration/automation user. Grants read access to the existing source objects, including Treatment Visits, and access required by the Treatment &amp; Records Follow-up automation.</description>
-    <fieldPermissions><editable>false</editable><field>Treatment_Visits__c.Matter__c</field><readable>true</readable></fieldPermissions>
-    <fieldPermissions><editable>false</editable><field>Treatment_Visits__c.Medical__c</field><readable>true</readable></fieldPermissions>
     <fieldPermissions><editable>false</editable><field>Treatment_Visits__c.Visit_Start__c</field><readable>true</readable></fieldPermissions>
     <fieldPermissions><editable>false</editable><field>Treatment_Visits__c.Visit_End__c</field><readable>true</readable></fieldPermissions>
     <fieldPermissions><editable>false</editable><field>Treatment_Visits__c.Visit_Attended__c</field><readable>true</readable></fieldPermissions>
