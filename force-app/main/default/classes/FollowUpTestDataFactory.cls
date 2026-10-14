@@ -10,8 +10,6 @@ public class FollowUpTestDataFactory {
 
     private static Integer fakeIdCounter = 0;
 
-    // ------------------------------------------------------------------ configuration
-
     public static void useDefaultConfig() {
         FollowUpConfig.rulesOverride = defaultRules();
         FollowUpConfig.settingOverride = defaultSetting();
@@ -44,7 +42,6 @@ public class FollowUpTestDataFactory {
         return rules;
     }
 
-    /** Only the given rules active (others removed) - isolates one rule per test. */
     public static void useOnlyRules(Set<String> ruleNames) {
         useDefaultConfig();
         Map<String, Follow_Up_Rule__mdt> rules = defaultRules();
@@ -156,9 +153,6 @@ public class FollowUpTestDataFactory {
         );
     }
 
-    // ------------------------------------------------------------------ users
-
-    /** Creates a Standard User with the given permission sets. Call inside System.runAs to avoid mixed DML. */
     public static User createUser(String alias, List<String> permissionSetNames) {
         Profile profile = [SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1];
         User user = new User(
@@ -191,8 +185,6 @@ public class FollowUpTestDataFactory {
         }
         return user;
     }
-
-    // ------------------------------------------------------------------ records
 
     public static Contact client(Id ownerId, String email, String mobile) {
         Contact client = new Contact(
@@ -227,12 +219,12 @@ public class FollowUpTestDataFactory {
         return matter;
     }
 
-    public static Treatment_Event__c treatment(Id matterId, Id providerId, Date treatmentDate, String status) {
-        return new Treatment_Event__c(
+    /** Existing production object used for treatment history; do not use the prerequisite Treatment_Event__c object. */
+    public static Treatment_Visits__c treatment(Id matterId, Id providerId, Date treatmentDate, String status) {
+        return new Treatment_Visits__c(
             Matter__c = matterId,
-            Medical_Provider__c = providerId,
-            Treatment_Date__c = treatmentDate,
-            Status__c = status
+            Provider__c = providerId,
+            Visit_Start__c = Datetime.newInstance(treatmentDate, Time.newInstance(12, 0, 0, 0))
         );
     }
 
@@ -246,7 +238,6 @@ public class FollowUpTestDataFactory {
         );
     }
 
-    /** A sent (approved) external follow-up, as it would look after delivery. */
     public static Follow_Up_Recommendation__c sentRecommendation(
         Id matterId,
         String recType,
@@ -269,7 +260,6 @@ public class FollowUpTestDataFactory {
         );
     }
 
-    /** A pending external recommendation ready for approval. */
     public static Follow_Up_Recommendation__c pendingRecommendation(
         Id matterId,
         String audience,
@@ -297,8 +287,6 @@ public class FollowUpTestDataFactory {
         );
     }
 
-    // ------------------------------------------------------------------ in-memory helpers (rule engine unit tests)
-
     public static Id fakeId(Schema.SObjectType sObjectType) {
         fakeIdCounter++;
         String counter = String.valueOf(fakeIdCounter);
@@ -307,7 +295,6 @@ public class FollowUpTestDataFactory {
         );
     }
 
-    /** In-memory matter context; no DML. */
     public static FollowUpMatterContext context(Date signUpDate, Contact client) {
         Matter__c matter = new Matter__c(
             Id = fakeId(Matter__c.SObjectType),
