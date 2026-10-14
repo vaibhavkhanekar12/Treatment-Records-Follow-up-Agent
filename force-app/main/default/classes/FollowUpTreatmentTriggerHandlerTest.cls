@@ -3,12 +3,12 @@ private class FollowUpTreatmentTriggerHandlerTest {
     @IsTest
     static void treatmentVisitInsertQueuesEvaluation() {
         Treatment_Visits__c visitRecord = new Treatment_Visits__c(
-            Matter__c = UserInfo.getUserId(),
-            Provider__c = UserInfo.getUserId(),
+            Matter__c = FollowUpTestDataFactory.fakeId(Matter__c.SObjectType),
+            Medical__c = FollowUpTestDataFactory.fakeId(Medical_Provider__c.SObjectType),
             Visit_Start__c = Datetime.now().addDays(-40),
             Visit_End__c = Datetime.now().addDays(-40).addHours(1),
             Visit_Attended__c = true,
-            Visit_Type__c = 'Initial Eval'
+            Visit_Type__c = 'Initial'
         );
 
         Test.startTest();
@@ -19,16 +19,16 @@ private class FollowUpTreatmentTriggerHandlerTest {
 
     @IsTest
     static void unchangedTreatmentVisitDoesNotQueue() {
-        Id recordId = UserInfo.getUserId();
+        Id recordId = FollowUpTestDataFactory.fakeId(Treatment_Visits__c.SObjectType);
         Datetime visitStart = Datetime.now().addDays(-40);
         Treatment_Visits__c oldVisit = new Treatment_Visits__c(
             Id = recordId,
-            Matter__c = UserInfo.getUserId(),
-            Provider__c = UserInfo.getUserId(),
+            Matter__c = FollowUpTestDataFactory.fakeId(Matter__c.SObjectType),
+            Medical__c = FollowUpTestDataFactory.fakeId(Medical_Provider__c.SObjectType),
             Visit_Start__c = visitStart,
             Visit_End__c = visitStart.addHours(1),
             Visit_Attended__c = true,
-            Visit_Type__c = 'Initial Eval'
+            Visit_Type__c = 'Initial'
         );
         Treatment_Visits__c newVisit = oldVisit.clone(true, false, false, false);
 
@@ -43,16 +43,16 @@ private class FollowUpTreatmentTriggerHandlerTest {
 
     @IsTest
     static void treatmentVisitDateChangeQueues() {
-        Id recordId = UserInfo.getUserId();
+        Id recordId = FollowUpTestDataFactory.fakeId(Treatment_Visits__c.SObjectType);
         Datetime visitStart = Datetime.now().addDays(-40);
         Treatment_Visits__c oldVisit = new Treatment_Visits__c(
             Id = recordId,
-            Matter__c = UserInfo.getUserId(),
-            Provider__c = UserInfo.getUserId(),
+            Matter__c = FollowUpTestDataFactory.fakeId(Matter__c.SObjectType),
+            Medical__c = FollowUpTestDataFactory.fakeId(Medical_Provider__c.SObjectType),
             Visit_Start__c = visitStart,
             Visit_End__c = visitStart.addHours(1),
             Visit_Attended__c = true,
-            Visit_Type__c = 'Initial Eval'
+            Visit_Type__c = 'Initial'
         );
         Treatment_Visits__c newVisit = oldVisit.clone(true, false, false, false);
         newVisit.Visit_Start__c = visitStart.addDays(1);
@@ -69,8 +69,8 @@ private class FollowUpTreatmentTriggerHandlerTest {
     @IsTest
     static void bypassPreventsQueueing() {
         Treatment_Visits__c visitRecord = new Treatment_Visits__c(
-            Matter__c = UserInfo.getUserId(),
-            Provider__c = UserInfo.getUserId(),
+            Matter__c = FollowUpTestDataFactory.fakeId(Matter__c.SObjectType),
+            Medical__c = FollowUpTestDataFactory.fakeId(Medical_Provider__c.SObjectType),
             Visit_Start__c = Datetime.now().addDays(-40)
         );
 
