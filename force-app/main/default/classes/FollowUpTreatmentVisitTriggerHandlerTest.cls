@@ -1,18 +1,16 @@
 @IsTest
 private class FollowUpTreatmentVisitTriggerHandlerTest {
     @IsTest
-    static void skipsNullAndEmptyInputs() {
+    static void ignoresNullOrEmptyInput() {
         FollowUpTreatmentVisitTriggerHandler.afterSave(null, null);
         FollowUpTreatmentVisitTriggerHandler.afterSave(new List<Treatment_Visits__c>(), null);
-        System.assertEquals(true, true, 'Null and empty input should be handled safely.');
+        System.assertEquals(0, Limits.getQueueableJobs());
     }
 
     @IsTest
-    static void enqueueQueueableForChangedVisit() {
-        // Tests the handler's change-detection and queueable scheduling without
-        // making assumptions about required fields in the existing client schema.
+    static void enqueuesEvaluationForInsertedVisit() {
+        // Only the lookup is needed to exercise handler change detection; no record is persisted.
         Treatment_Visits__c visitRecord = new Treatment_Visits__c(
-            Id = (Id) 'a01000000000001AAA',
             Matter__c = (Id) 'a02000000000001AAA',
             Visit_Start__c = Datetime.newInstance(2026, 1, 1, 10, 0, 0),
             Provider__c = (Id) 'a03000000000001AAA'
@@ -23,15 +21,13 @@ private class FollowUpTreatmentVisitTriggerHandlerTest {
             new List<Treatment_Visits__c>{ visitRecord },
             null
         );
+        System.assertEquals(1, Limits.getQueueableJobs(), 'An inserted visit should schedule matter evaluation.');
         Test.stopTest();
-
-        System.assertEquals(1, Limits.getQueueableJobs(), 'A changed treatment visit should queue evaluation.');
     }
 
     @IsTest
     static void bypassPreventsQueueing() {
         Treatment_Visits__c visitRecord = new Treatment_Visits__c(
-            Id = (Id) 'a01000000000001AAA',
             Matter__c = (Id) 'a02000000000001AAA',
             Visit_Start__c = Datetime.newInstance(2026, 1, 1, 10, 0, 0),
             Provider__c = (Id) 'a03000000000001AAA'
@@ -42,8 +38,8 @@ private class FollowUpTreatmentVisitTriggerHandlerTest {
             new List<Treatment_Visits__c>{ visitRecord },
             null
         );
+        System.assertEquals(0, Limits.getQueueableJobs(), 'Bypass should suppress queueing.');
         Test.stopTest();
         FollowUpTreatmentVisitTriggerHandler.bypass = false;
-        System.assertEquals(0, Limits.getQueueableJobs(), 'Bypass should prevent evaluation.');
     }
 }
