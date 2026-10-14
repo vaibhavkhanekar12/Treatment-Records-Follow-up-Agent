@@ -77,7 +77,7 @@ Use your actual alias in subsequent commands. Confirm the org username and insta
 Complete `docs/org-discovery.md` before deploying. Confirm actual API names, field types, required fields, picklist values, lookup relationships, validation/duplicate rules, and existing automation for:
 
 - `Matter__c` (the target org is expected to already have this object)
-- `Treatment_Event__c`
+- `Treatment_Visits__c`
 - `Records_Request__c`
 - `Medical_Provider__c`
 - `Contact` and `Task`
